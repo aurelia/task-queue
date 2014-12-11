@@ -17,7 +17,7 @@
   "main": "dist/commonjs/index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/aurelia/task-queue"
+    "url": "http://github.com/aurelia/task-queue"
   },
   "jspm": {
     "main": "amd/index",
