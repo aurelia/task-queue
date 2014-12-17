@@ -1,4 +1,4 @@
-import {TaskQueue} from '../lib/index';
+import {TaskQueue} from '../src/index';
 
 describe('task queue', () => {
   it('should have some tests', () => {
