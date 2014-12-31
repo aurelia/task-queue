@@ -2,7 +2,7 @@
 
 This library is part of the [Aurelia](http://www.aurelia.io/) platform and contains a simple task queue for the browser that enables the queuing of both standard tasks and micro tasks.
 
-> To keep up to date on [Aurelia](http://www.aurelia.io/), please visit and subscribe to [the official blog](http://blog.durandal.io/). If you have questions, we invite you to join us on [our Gitter Channel](https://gitter.im/Aurelia/Discuss).
+> To keep up to date on [Aurelia](http://www.aurelia.io/), please visit and subscribe to [the official blog](http://blog.durandal.io/). If you have questions, we invite you to join us on [our Gitter Channel](https://gitter.im/aurelia/discuss).
 
 ## Dependencies
 
