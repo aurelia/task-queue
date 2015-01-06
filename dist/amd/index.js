@@ -27,105 +27,101 @@ define(["exports"], function (exports) {
     };
   }
 
-  var TaskQueue = (function () {
-    var TaskQueue = function TaskQueue() {
-      var _this = this;
-      this.microTaskQueue = [];
-      this.microTaskQueueCapacity = 1024;
-      this.taskQueue = [];
+  var TaskQueue = function TaskQueue() {
+    var _this = this;
+    this.microTaskQueue = [];
+    this.microTaskQueueCapacity = 1024;
+    this.taskQueue = [];
 
-      if (typeof BrowserMutationObserver === "function") {
-        this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
-          return _this.flushMicroTaskQueue();
-        });
-      } else {
-        this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(function () {
-          return _this.flushMicroTaskQueue();
-        });
-      }
-
-      this.requestFlushTaskQueue = makeRequestFlushFromTimer(function () {
-        return _this.flushTaskQueue();
+    if (typeof BrowserMutationObserver === "function") {
+      this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
+        return _this.flushMicroTaskQueue();
       });
-    };
+    } else {
+      this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(function () {
+        return _this.flushMicroTaskQueue();
+      });
+    }
 
-    TaskQueue.prototype.queueMicroTask = function (task) {
-      if (!this.microTaskQueue.length) {
-        this.requestFlushMicroTaskQueue();
+    this.requestFlushTaskQueue = makeRequestFlushFromTimer(function () {
+      return _this.flushTaskQueue();
+    });
+  };
+
+  TaskQueue.prototype.queueMicroTask = function (task) {
+    if (!this.microTaskQueue.length) {
+      this.requestFlushMicroTaskQueue();
+    }
+
+    this.microTaskQueue.push(task);
+  };
+
+  TaskQueue.prototype.queueTask = function (task) {
+    if (!this.taskQueue.length) {
+      this.requestFlushTaskQueue();
+    }
+
+    this.taskQueue.push(task);
+  };
+
+  TaskQueue.prototype.flushTaskQueue = function () {
+    var queue = this.taskQueue, index = 0, task;
+
+    this.taskQueue = [];
+
+    while (index < queue.length) {
+      task = queue[index];
+
+      try {
+        task.call();
+      } catch (error) {
+        this.onError(error, task);
       }
 
-      this.microTaskQueue.push(task);
-    };
+      index++;
+    }
+  };
 
-    TaskQueue.prototype.queueTask = function (task) {
-      if (!this.taskQueue.length) {
-        this.requestFlushTaskQueue();
+  TaskQueue.prototype.flushMicroTaskQueue = function () {
+    var queue = this.microTaskQueue, capacity = this.microTaskQueueCapacity, index = 0, task;
+
+    while (index < queue.length) {
+      task = queue[index];
+
+      try {
+        task.call();
+      } catch (error) {
+        this.onError(error, task);
       }
 
-      this.taskQueue.push(task);
-    };
+      index++;
 
-    TaskQueue.prototype.flushTaskQueue = function () {
-      var queue = this.taskQueue, index = 0, task;
-
-      this.taskQueue = [];
-
-      while (index < queue.length) {
-        task = queue[index];
-
-        try {
-          task.call();
-        } catch (error) {
-          this.onError(error, task);
+      if (index > capacity) {
+        for (var scan = 0; scan < index; scan++) {
+          queue[scan] = queue[scan + index];
         }
 
-        index++;
+        queue.length -= index;
+        index = 0;
       }
-    };
+    }
 
-    TaskQueue.prototype.flushMicroTaskQueue = function () {
-      var queue = this.microTaskQueue, capacity = this.microTaskQueueCapacity, index = 0, task;
+    queue.length = 0;
+  };
 
-      while (index < queue.length) {
-        task = queue[index];
-
-        try {
-          task.call();
-        } catch (error) {
-          this.onError(error, task);
-        }
-
-        index++;
-
-        if (index > capacity) {
-          for (var scan = 0; scan < index; scan++) {
-            queue[scan] = queue[scan + index];
-          }
-
-          queue.length -= index;
-          index = 0;
-        }
-      }
-
-      queue.length = 0;
-    };
-
-    TaskQueue.prototype.onError = function (error, task) {
-      if ("onError" in task) {
-        task.onError(error);
-      } else if (hasSetImmediate) {
-        setImmediate(function () {
-          throw error;
-        });
-      } else {
-        setTimeout(function () {
-          throw error;
-        }, 0);
-      }
-    };
-
-    return TaskQueue;
-  })();
+  TaskQueue.prototype.onError = function (error, task) {
+    if ("onError" in task) {
+      task.onError(error);
+    } else if (hasSetImmediate) {
+      setImmediate(function () {
+        throw error;
+      });
+    } else {
+      setTimeout(function () {
+        throw error;
+      }, 0);
+    }
+  };
 
   exports.TaskQueue = TaskQueue;
 });
