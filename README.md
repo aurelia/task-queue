@@ -1,4 +1,4 @@
-# aurelia-metadata
+# aurelia-task-queue
 
 This library is part of the [Aurelia](http://www.aurelia.io/) platform and contains a simple task queue for the browser that enables the queuing of both standard tasks and micro tasks.
 
