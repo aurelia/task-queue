@@ -21,18 +21,19 @@ function makeRequestFlushFromMutationObserver(flush) {
 
 function makeRequestFlushFromTimer(flush) {
   return function requestFlush() {
-    var timeoutHandle = setTimeout(handleFlushTimer, 0);
-    var intervalHandle = setInterval(handleFlushTimer, 50);
-    function handleFlushTimer() {
+    var handleFlushTimer = function () {
       clearTimeout(timeoutHandle);
       clearInterval(intervalHandle);
       flush();
-    }
+    };
+
+    var timeoutHandle = setTimeout(handleFlushTimer, 0);
+    var intervalHandle = setInterval(handleFlushTimer, 50);
   };
 }
 
 var TaskQueue = (function () {
-  var TaskQueue = function TaskQueue() {
+  function TaskQueue() {
     var _this = this;
     this.microTaskQueue = [];
     this.microTaskQueueCapacity = 1024;
@@ -51,11 +52,11 @@ var TaskQueue = (function () {
     this.requestFlushTaskQueue = makeRequestFlushFromTimer(function () {
       return _this.flushTaskQueue();
     });
-  };
+  }
 
   _prototypeProperties(TaskQueue, null, {
     queueMicroTask: {
-      value: function (task) {
+      value: function queueMicroTask(task) {
         if (!this.microTaskQueue.length) {
           this.requestFlushMicroTaskQueue();
         }
@@ -67,7 +68,7 @@ var TaskQueue = (function () {
       configurable: true
     },
     queueTask: {
-      value: function (task) {
+      value: function queueTask(task) {
         if (!this.taskQueue.length) {
           this.requestFlushTaskQueue();
         }
@@ -79,7 +80,7 @@ var TaskQueue = (function () {
       configurable: true
     },
     flushTaskQueue: {
-      value: function () {
+      value: function flushTaskQueue() {
         var queue = this.taskQueue,
             index = 0,
             task;
@@ -103,7 +104,7 @@ var TaskQueue = (function () {
       configurable: true
     },
     flushMicroTaskQueue: {
-      value: function () {
+      value: function flushMicroTaskQueue() {
         var queue = this.microTaskQueue,
             capacity = this.microTaskQueueCapacity,
             index = 0,
@@ -137,7 +138,7 @@ var TaskQueue = (function () {
       configurable: true
     },
     onError: {
-      value: function (error, task) {
+      value: function onError(error, task) {
         if ("onError" in task) {
           task.onError(error);
         } else if (hasSetImmediate) {
