@@ -49,18 +49,18 @@ export class TaskQueue {
   }
 
   queueMicroTask(task){
-    if (!this.microTaskQueue.length) {
+    if (this.microTaskQueue.length < 1) {
       this.requestFlushMicroTaskQueue();
     }
-    
+
     this.microTaskQueue.push(task);
   }
 
   queueTask(task){
-    if (!this.taskQueue.length) {
+    if (this.taskQueue.length < 1) {
       this.requestFlushTaskQueue();
     }
-    
+
     this.taskQueue.push(task);
   }
 

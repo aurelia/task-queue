@@ -1,9 +1,6 @@
 "use strict";
 
-var _prototypeProperties = function (child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);
-  if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 var BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 var hasSetImmediate = typeof setImmediate === "function";
@@ -21,18 +18,17 @@ function makeRequestFlushFromMutationObserver(flush) {
 
 function makeRequestFlushFromTimer(flush) {
   return function requestFlush() {
-    var handleFlushTimer = function () {
+    var timeoutHandle = setTimeout(handleFlushTimer, 0);
+    var intervalHandle = setInterval(handleFlushTimer, 50);
+    function handleFlushTimer() {
       clearTimeout(timeoutHandle);
       clearInterval(intervalHandle);
       flush();
-    };
-
-    var timeoutHandle = setTimeout(handleFlushTimer, 0);
-    var intervalHandle = setInterval(handleFlushTimer, 50);
+    }
   };
 }
 
-var TaskQueue = (function () {
+var TaskQueue = exports.TaskQueue = (function () {
   function TaskQueue() {
     var _this = this;
     this.microTaskQueue = [];
@@ -57,26 +53,24 @@ var TaskQueue = (function () {
   _prototypeProperties(TaskQueue, null, {
     queueMicroTask: {
       value: function queueMicroTask(task) {
-        if (!this.microTaskQueue.length) {
+        if (this.microTaskQueue.length < 1) {
           this.requestFlushMicroTaskQueue();
         }
 
         this.microTaskQueue.push(task);
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     queueTask: {
       value: function queueTask(task) {
-        if (!this.taskQueue.length) {
+        if (this.taskQueue.length < 1) {
           this.requestFlushTaskQueue();
         }
 
         this.taskQueue.push(task);
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     flushTaskQueue: {
@@ -100,7 +94,6 @@ var TaskQueue = (function () {
         }
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     flushMicroTaskQueue: {
@@ -134,7 +127,6 @@ var TaskQueue = (function () {
         queue.length = 0;
       },
       writable: true,
-      enumerable: true,
       configurable: true
     },
     onError: {
@@ -152,12 +144,10 @@ var TaskQueue = (function () {
         }
       },
       writable: true,
-      enumerable: true,
       configurable: true
     }
   });
 
   return TaskQueue;
 })();
-
-exports.TaskQueue = TaskQueue;
+exports.__esModule = true;

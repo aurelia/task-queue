@@ -17,28 +17,24 @@ System.register([], function (_export) {
 
   function makeRequestFlushFromTimer(flush) {
     return function requestFlush() {
-      var handleFlushTimer = function () {
+      var timeoutHandle = setTimeout(handleFlushTimer, 0);
+      var intervalHandle = setInterval(handleFlushTimer, 50);
+      function handleFlushTimer() {
         clearTimeout(timeoutHandle);
         clearInterval(intervalHandle);
         flush();
-      };
-
-      var timeoutHandle = setTimeout(handleFlushTimer, 0);
-      var intervalHandle = setInterval(handleFlushTimer, 50);
+      }
     };
   }
 
   return {
     setters: [],
     execute: function () {
-      _prototypeProperties = function (child, staticProps, instanceProps) {
-        if (staticProps) Object.defineProperties(child, staticProps);
-        if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-      };
+      _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
       BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
       hasSetImmediate = typeof setImmediate === "function";
-      TaskQueue = (function () {
+      TaskQueue = _export("TaskQueue", (function () {
         function TaskQueue() {
           var _this = this;
           this.microTaskQueue = [];
@@ -63,26 +59,24 @@ System.register([], function (_export) {
         _prototypeProperties(TaskQueue, null, {
           queueMicroTask: {
             value: function queueMicroTask(task) {
-              if (!this.microTaskQueue.length) {
+              if (this.microTaskQueue.length < 1) {
                 this.requestFlushMicroTaskQueue();
               }
 
               this.microTaskQueue.push(task);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           queueTask: {
             value: function queueTask(task) {
-              if (!this.taskQueue.length) {
+              if (this.taskQueue.length < 1) {
                 this.requestFlushTaskQueue();
               }
 
               this.taskQueue.push(task);
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           flushTaskQueue: {
@@ -106,7 +100,6 @@ System.register([], function (_export) {
               }
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           flushMicroTaskQueue: {
@@ -140,7 +133,6 @@ System.register([], function (_export) {
               queue.length = 0;
             },
             writable: true,
-            enumerable: true,
             configurable: true
           },
           onError: {
@@ -158,14 +150,12 @@ System.register([], function (_export) {
               }
             },
             writable: true,
-            enumerable: true,
             configurable: true
           }
         });
 
         return TaskQueue;
-      })();
-      _export("TaskQueue", TaskQueue);
+      })());
     }
   };
 });
