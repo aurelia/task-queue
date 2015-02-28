@@ -1,3 +1,11 @@
+### 0.2.4 (2015-02-28)
+
+
+#### Bug Fixes
+
+* **build:** add missing bower bump ([fdb2fe41](http://github.com/aurelia/task-queue/commit/fdb2fe41aa643670516db855731ef18c9050661c))
+
+
 ### 0.2.3 (2015-02-03)
 
 * Performance improvements.

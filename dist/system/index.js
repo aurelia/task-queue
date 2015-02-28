@@ -1,8 +1,5 @@
 System.register([], function (_export) {
-  "use strict";
-
-  var _prototypeProperties, BrowserMutationObserver, hasSetImmediate, TaskQueue;
-
+  var _prototypeProperties, _classCallCheck, BrowserMutationObserver, hasSetImmediate, TaskQueue;
 
   function makeRequestFlushFromMutationObserver(flush) {
     var toggle = 1;
@@ -17,9 +14,18 @@ System.register([], function (_export) {
 
   function makeRequestFlushFromTimer(flush) {
     return function requestFlush() {
+      // We dispatch a timeout with a specified delay of 0 for engines that
+      // can reliably accommodate that request. This will usually be snapped
+      // to a 4 milisecond delay, but once we're flushing, there's no delay
+      // between events.
       var timeoutHandle = setTimeout(handleFlushTimer, 0);
+      // However, since this timer gets frequently dropped in Firefox
+      // workers, we enlist an interval handle that will try to fire
+      // an event 20 times per second until it succeeds.
       var intervalHandle = setInterval(handleFlushTimer, 50);
       function handleFlushTimer() {
+        // Whichever timer succeeds will cancel both timers and request the
+        // flush.
         clearTimeout(timeoutHandle);
         clearInterval(intervalHandle);
         flush();
@@ -30,13 +36,20 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
+      "use strict";
+
       _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
       BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
       hasSetImmediate = typeof setImmediate === "function";
       TaskQueue = _export("TaskQueue", (function () {
         function TaskQueue() {
           var _this = this;
+
+          _classCallCheck(this, TaskQueue);
+
           this.microTaskQueue = [];
           this.microTaskQueueCapacity = 1024;
           this.taskQueue = [];
@@ -85,7 +98,7 @@ System.register([], function (_export) {
                   index = 0,
                   task;
 
-              this.taskQueue = [];
+              this.taskQueue = []; //recursive calls to queueTask should be scheduled after the next cycle
 
               while (index < queue.length) {
                 task = queue[index];
@@ -120,7 +133,14 @@ System.register([], function (_export) {
 
                 index++;
 
+                // Prevent leaking memory for long chains of recursive calls to `queueMicroTask`.
+                // If we call `queueMicroTask` within a MicroTask scheduled by `queueMicroTask`, the queue will
+                // grow, but to avoid an O(n) walk for every MicroTask we execute, we don't
+                // shift MicroTasks off the queue after they have been executed.
+                // Instead, we periodically shift 1024 MicroTasks off the queue.
                 if (index > capacity) {
+                  // Manually shift all values starting at the index back to the
+                  // beginning of the queue.
                   for (var scan = 0; scan < index; scan++) {
                     queue[scan] = queue[scan + index];
                   }
