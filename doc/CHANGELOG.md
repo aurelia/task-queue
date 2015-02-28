@@ -1,3 +1,11 @@
+### 0.2.5 (2015-02-28)
+
+
+#### Bug Fixes
+
+* **package:** change jspm directories ([fba51f23](http://github.com/aurelia/task-queue/commit/fba51f234b61e0127fd8bb29ce960964167e57b0))
+
+
 ### 0.2.4 (2015-02-28)
 
 
