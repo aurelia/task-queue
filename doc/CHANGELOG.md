@@ -1,3 +1,11 @@
+## 0.3.0 (2015-04-09)
+
+
+#### Bug Fixes
+
+* **all:** update compiler ([c7718a62](http://github.com/aurelia/task-queue/commit/c7718a62eaff54f6e788074704dcb51a1e44e39c))
+
+
 ### 0.2.5 (2015-02-28)
 
 
