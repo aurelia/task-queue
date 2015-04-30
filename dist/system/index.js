@@ -1,5 +1,5 @@
 System.register([], function (_export) {
-  var _classCallCheck, _createClass, BrowserMutationObserver, hasSetImmediate, TaskQueue;
+  var _classCallCheck, BrowserMutationObserver, hasSetImmediate, TaskQueue;
 
   function makeRequestFlushFromMutationObserver(flush) {
     var toggle = 1;
@@ -32,8 +32,6 @@ System.register([], function (_export) {
 
       _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-      _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
       BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
       hasSetImmediate = typeof setImmediate === 'function';
 
@@ -62,92 +60,85 @@ System.register([], function (_export) {
           });
         }
 
-        _createClass(TaskQueue, [{
-          key: 'queueMicroTask',
-          value: function queueMicroTask(task) {
-            if (this.microTaskQueue.length < 1) {
-              this.requestFlushMicroTaskQueue();
+        TaskQueue.prototype.queueMicroTask = function queueMicroTask(task) {
+          if (this.microTaskQueue.length < 1) {
+            this.requestFlushMicroTaskQueue();
+          }
+
+          this.microTaskQueue.push(task);
+        };
+
+        TaskQueue.prototype.queueTask = function queueTask(task) {
+          if (this.taskQueue.length < 1) {
+            this.requestFlushTaskQueue();
+          }
+
+          this.taskQueue.push(task);
+        };
+
+        TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
+          var queue = this.taskQueue,
+              index = 0,
+              task;
+
+          this.taskQueue = [];
+
+          while (index < queue.length) {
+            task = queue[index];
+
+            try {
+              task.call();
+            } catch (error) {
+              this.onError(error, task);
             }
 
-            this.microTaskQueue.push(task);
+            index++;
           }
-        }, {
-          key: 'queueTask',
-          value: function queueTask(task) {
-            if (this.taskQueue.length < 1) {
-              this.requestFlushTaskQueue();
+        };
+
+        TaskQueue.prototype.flushMicroTaskQueue = function flushMicroTaskQueue() {
+          var queue = this.microTaskQueue,
+              capacity = this.microTaskQueueCapacity,
+              index = 0,
+              task;
+
+          while (index < queue.length) {
+            task = queue[index];
+
+            try {
+              task.call();
+            } catch (error) {
+              this.onError(error, task);
             }
 
-            this.taskQueue.push(task);
-          }
-        }, {
-          key: 'flushTaskQueue',
-          value: function flushTaskQueue() {
-            var queue = this.taskQueue,
-                index = 0,
-                task;
+            index++;
 
-            this.taskQueue = [];
-
-            while (index < queue.length) {
-              task = queue[index];
-
-              try {
-                task.call();
-              } catch (error) {
-                this.onError(error, task);
+            if (index > capacity) {
+              for (var scan = 0; scan < index; scan++) {
+                queue[scan] = queue[scan + index];
               }
 
-              index++;
+              queue.length -= index;
+              index = 0;
             }
           }
-        }, {
-          key: 'flushMicroTaskQueue',
-          value: function flushMicroTaskQueue() {
-            var queue = this.microTaskQueue,
-                capacity = this.microTaskQueueCapacity,
-                index = 0,
-                task;
 
-            while (index < queue.length) {
-              task = queue[index];
+          queue.length = 0;
+        };
 
-              try {
-                task.call();
-              } catch (error) {
-                this.onError(error, task);
-              }
-
-              index++;
-
-              if (index > capacity) {
-                for (var scan = 0; scan < index; scan++) {
-                  queue[scan] = queue[scan + index];
-                }
-
-                queue.length -= index;
-                index = 0;
-              }
-            }
-
-            queue.length = 0;
+        TaskQueue.prototype.onError = function onError(error, task) {
+          if ('onError' in task) {
+            task.onError(error);
+          } else if (hasSetImmediate) {
+            setImmediate(function () {
+              throw error;
+            });
+          } else {
+            setTimeout(function () {
+              throw error;
+            }, 0);
           }
-        }, {
-          key: 'onError',
-          value: function onError(error, task) {
-            if ('onError' in task) {
-              task.onError(error);
-            } else if (hasSetImmediate) {
-              setImmediate(function () {
-                throw error;
-              });
-            } else {
-              setTimeout(function () {
-                throw error;
-              }, 0);
-            }
-          }
-        }]);
+        };
 
         return TaskQueue;
       })();
