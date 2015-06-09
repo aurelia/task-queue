@@ -1,5 +1,9 @@
 System.register([], function (_export) {
-  var _classCallCheck, BrowserMutationObserver, hasSetImmediate, TaskQueue;
+  'use strict';
+
+  var BrowserMutationObserver, hasSetImmediate, TaskQueue;
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function makeRequestFlushFromMutationObserver(flush) {
     var toggle = 1;
@@ -28,10 +32,6 @@ System.register([], function (_export) {
   return {
     setters: [],
     execute: function () {
-      'use strict';
-
-      _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
       BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
       hasSetImmediate = typeof setImmediate === 'function';
 

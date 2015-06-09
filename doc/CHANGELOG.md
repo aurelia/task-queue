@@ -1,3 +1,6 @@
+## 0.5.0 (2015-06-08)
+
+
 ## 0.4.0 (2015-04-30)
 
 **all:** update compilation process
