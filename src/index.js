@@ -33,6 +33,10 @@ function makeRequestFlushFromTimer(flush) {
   };
 }
 
+interface Callable {
+  //call(): void;
+}
+
 export class TaskQueue {
   constructor(){
     this.microTaskQueue = [];
@@ -48,7 +52,7 @@ export class TaskQueue {
     this.requestFlushTaskQueue = makeRequestFlushFromTimer(() => this.flushTaskQueue());
   }
 
-  queueMicroTask(task){
+  queueMicroTask(task: Callable | Function): void {
     if (this.microTaskQueue.length < 1) {
       this.requestFlushMicroTaskQueue();
     }
@@ -56,7 +60,7 @@ export class TaskQueue {
     this.microTaskQueue.push(task);
   }
 
-  queueTask(task){
+  queueTask(task: Callable | Function): void {
     if (this.taskQueue.length < 1) {
       this.requestFlushTaskQueue();
     }
@@ -64,7 +68,7 @@ export class TaskQueue {
     this.taskQueue.push(task);
   }
 
-  flushTaskQueue(){
+  flushTaskQueue(): void {
     var queue = this.taskQueue,
         index = 0,
         task;
@@ -84,7 +88,7 @@ export class TaskQueue {
     }
   }
 
-  flushMicroTaskQueue(){
+  flushMicroTaskQueue(): void {
     var queue = this.microTaskQueue,
         capacity = this.microTaskQueueCapacity,
         index = 0,
@@ -121,7 +125,7 @@ export class TaskQueue {
     queue.length = 0;
   }
 
-  onError(error, task){
+  onError(error: Error, task: Callable | Function): void {
     if('onError' in task){
       task.onError(error);
     } else if (hasSetImmediate) {
