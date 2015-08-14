@@ -1,3 +1,11 @@
+### 0.6.2 (2015-08-14)
+
+
+#### Features
+
+* **all:** add more type info ([7ba861b8](http://github.com/aurelia/task-queue/commit/7ba861b89bf64900d82b632f2d68475bce75e616))
+
+
 ### 0.6.1 (2015-07-29)
 
 * improve output file name
