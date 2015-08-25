@@ -75,16 +75,14 @@ export class TaskQueue {
 
     this.taskQueue = []; //recursive calls to queueTask should be scheduled after the next cycle
 
-    while (index < queue.length) {
-      task = queue[index];
-
-      try{
+    try {
+      while(index < queue.length) {
+        task = queue[index];
         task.call();
-      } catch(error){
-        this.onError(error, task);
+        index++;
       }
-
-      index++;
+    } catch(error){
+      this.onError(error, task);
     }
   }
 
@@ -94,32 +92,30 @@ export class TaskQueue {
         index = 0,
         task;
 
-    while (index < queue.length) {
-      task = queue[index];
-
-      try{
+    try {
+      while(index < queue.length) {
+        task = queue[index];
         task.call();
-      } catch(error){
-        this.onError(error, task);
+        index++;
+
+        // Prevent leaking memory for long chains of recursive calls to `queueMicroTask`.
+        // If we call `queueMicroTask` within a MicroTask scheduled by `queueMicroTask`, the queue will
+        // grow, but to avoid an O(n) walk for every MicroTask we execute, we don't
+        // shift MicroTasks off the queue after they have been executed.
+        // Instead, we periodically shift 1024 MicroTasks off the queue.
+        if (index > capacity) {
+            // Manually shift all values starting at the index back to the
+            // beginning of the queue.
+            for (var scan = 0; scan < index; scan++) {
+                queue[scan] = queue[scan + index];
+            }
+
+            queue.length -= index;
+            index = 0;
+        }
       }
-
-      index++;
-
-      // Prevent leaking memory for long chains of recursive calls to `queueMicroTask`.
-      // If we call `queueMicroTask` within a MicroTask scheduled by `queueMicroTask`, the queue will
-      // grow, but to avoid an O(n) walk for every MicroTask we execute, we don't
-      // shift MicroTasks off the queue after they have been executed.
-      // Instead, we periodically shift 1024 MicroTasks off the queue.
-      if (index > capacity) {
-          // Manually shift all values starting at the index back to the
-          // beginning of the queue.
-          for (var scan = 0; scan < index; scan++) {
-              queue[scan] = queue[scan + index];
-          }
-
-          queue.length -= index;
-          index = 0;
-      }
+    } catch(error){
+      this.onError(error, task);
     }
 
     queue.length = 0;
