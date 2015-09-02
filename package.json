@@ -24,6 +24,13 @@
     "format": "amd",
     "directories": {
       "lib": "dist/amd"
+    },
+    "devDependencies": {
+      "babel": "npm:babel-core@^5.1.13",
+      "babel-runtime": "npm:babel-runtime@^5.1.13",
+      "core-js": "npm:core-js@^0.9.5",
+      "traceur": "github:jmcriffey/bower-traceur@0.0.91",
+      "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.91"
     }
   },
   "devDependencies": {
@@ -36,6 +43,8 @@
     "gulp-bump": "^0.3.1",
     "gulp-jshint": "^1.9.0",
     "gulp-rename": "^1.2.2",
+    "gulp-typedoc": "^1.2.1",
+    "gulp-typedoc-extractor": "^0.0.8",
     "gulp-yuidoc": "^0.1.2",
     "jasmine-core": "^2.1.3",
     "jshint-stylish": "^1.0.0",
@@ -48,6 +57,7 @@
     "object.assign": "^1.0.3",
     "require-dir": "^0.1.0",
     "run-sequence": "^1.0.2",
+    "vinyl": "^0.5.1",
     "vinyl-paths": "^1.0.0",
     "yargs": "^2.1.1"
   },
