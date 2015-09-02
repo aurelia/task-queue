@@ -1,10 +1,10 @@
-var BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-var hasSetImmediate = typeof setImmediate === 'function';
+let BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+let hasSetImmediate = typeof setImmediate === 'function';
 
 function makeRequestFlushFromMutationObserver(flush) {
-  var toggle = 1;
-  var observer = new BrowserMutationObserver(flush);
-  var node = document.createTextNode('');
+  let toggle = 1;
+  let observer = new BrowserMutationObserver(flush);
+  let node = document.createTextNode('');
   observer.observe(node, {characterData: true});
   return function requestFlush() {
     toggle = -toggle;
@@ -18,11 +18,11 @@ function makeRequestFlushFromTimer(flush) {
     // can reliably accommodate that request. This will usually be snapped
     // to a 4 milisecond delay, but once we're flushing, there's no delay
     // between events.
-    var timeoutHandle = setTimeout(handleFlushTimer, 0);
+    let timeoutHandle = setTimeout(handleFlushTimer, 0);
     // However, since this timer gets frequently dropped in Firefox
     // workers, we enlist an interval handle that will try to fire
     // an event 20 times per second until it succeeds.
-    var intervalHandle = setInterval(handleFlushTimer, 50);
+    let intervalHandle = setInterval(handleFlushTimer, 50);
     function handleFlushTimer() {
       // Whichever timer succeeds will cancel both timers and request the
       // flush.
@@ -34,11 +34,11 @@ function makeRequestFlushFromTimer(flush) {
 }
 
 interface Callable {
-  //call(): void;
+  call(): void;
 }
 
 export class TaskQueue {
-  constructor(){
+  constructor() {
     this.microTaskQueue = [];
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
@@ -69,31 +69,31 @@ export class TaskQueue {
   }
 
   flushTaskQueue(): void {
-    var queue = this.taskQueue,
-        index = 0,
-        task;
+    let queue = this.taskQueue;
+    let index = 0;
+    let task;
 
     this.taskQueue = []; //recursive calls to queueTask should be scheduled after the next cycle
 
     try {
-      while(index < queue.length) {
+      while (index < queue.length) {
         task = queue[index];
         task.call();
         index++;
       }
-    } catch(error){
+    } catch (error) {
       this.onError(error, task);
     }
   }
 
   flushMicroTaskQueue(): void {
-    var queue = this.microTaskQueue,
-        capacity = this.microTaskQueueCapacity,
-        index = 0,
-        task;
+    let queue = this.microTaskQueue;
+    let capacity = this.microTaskQueueCapacity;
+    let index = 0;
+    let task;
 
     try {
-      while(index < queue.length) {
+      while (index < queue.length) {
         task = queue[index];
         task.call();
         index++;
@@ -106,15 +106,15 @@ export class TaskQueue {
         if (index > capacity) {
             // Manually shift all values starting at the index back to the
             // beginning of the queue.
-            for (var scan = 0; scan < index; scan++) {
-                queue[scan] = queue[scan + index];
-            }
+          for (let scan = 0; scan < index; scan++) {
+            queue[scan] = queue[scan + index];
+          }
 
-            queue.length -= index;
-            index = 0;
+          queue.length -= index;
+          index = 0;
         }
       }
-    } catch(error){
+    } catch (error) {
       this.onError(error, task);
     }
 
@@ -122,7 +122,7 @@ export class TaskQueue {
   }
 
   onError(error: Error, task: Callable | Function): void {
-    if('onError' in task){
+    if ('onError' in task) {
       task.onError(error);
     } else if (hasSetImmediate) {
       setImmediate(() => { throw error; });
