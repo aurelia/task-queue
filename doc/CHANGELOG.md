@@ -1,3 +1,16 @@
+## 0.7.0 (2015-09-04)
+
+
+#### Bug Fixes
+
+* **build:** update linting, testing and tools ([8c213d11](http://github.com/aurelia/task-queue/commit/8c213d1122f24724dc7d5194752b4e30fe32aca5))
+
+
+#### Features
+
+* **docs:** generate api.json from .d.ts file ([a05008a5](http://github.com/aurelia/task-queue/commit/a05008a5482cedf53583b206a97c02e9ed6c49a3))
+
+
 ### 0.6.2 (2015-08-14)
 
 

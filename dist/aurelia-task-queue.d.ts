@@ -1,8 +1,7 @@
 declare module 'aurelia-task-queue' {
   export interface Callable {
+    call(): void;
   }
-  
-  // call(): void;
   export class TaskQueue {
     constructor();
     queueMicroTask(task: Callable | Function): void;

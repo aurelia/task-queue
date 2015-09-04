@@ -73,50 +73,46 @@ var TaskQueue = (function () {
   };
 
   TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
-    var queue = this.taskQueue,
-        index = 0,
-        task;
+    var queue = this.taskQueue;
+    var index = 0;
+    var task = undefined;
 
     this.taskQueue = [];
 
-    while (index < queue.length) {
-      task = queue[index];
-
-      try {
+    try {
+      while (index < queue.length) {
+        task = queue[index];
         task.call();
-      } catch (error) {
-        this.onError(error, task);
+        index++;
       }
-
-      index++;
+    } catch (error) {
+      this.onError(error, task);
     }
   };
 
   TaskQueue.prototype.flushMicroTaskQueue = function flushMicroTaskQueue() {
-    var queue = this.microTaskQueue,
-        capacity = this.microTaskQueueCapacity,
-        index = 0,
-        task;
+    var queue = this.microTaskQueue;
+    var capacity = this.microTaskQueueCapacity;
+    var index = 0;
+    var task = undefined;
 
-    while (index < queue.length) {
-      task = queue[index];
-
-      try {
+    try {
+      while (index < queue.length) {
+        task = queue[index];
         task.call();
-      } catch (error) {
-        this.onError(error, task);
-      }
+        index++;
 
-      index++;
+        if (index > capacity) {
+          for (var scan = 0; scan < index; scan++) {
+            queue[scan] = queue[scan + index];
+          }
 
-      if (index > capacity) {
-        for (var scan = 0; scan < index; scan++) {
-          queue[scan] = queue[scan + index];
+          queue.length -= index;
+          index = 0;
         }
-
-        queue.length -= index;
-        index = 0;
       }
+    } catch (error) {
+      this.onError(error, task);
     }
 
     queue.length = 0;
