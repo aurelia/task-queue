@@ -1,10 +1,11 @@
-let BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+import {DOM} from 'aurelia-pal';
+
 let hasSetImmediate = typeof setImmediate === 'function';
 
 function makeRequestFlushFromMutationObserver(flush) {
   let toggle = 1;
-  let observer = new BrowserMutationObserver(flush);
-  let node = document.createTextNode('');
+  let observer = DOM.createMutationObserver(flush);
+  let node = DOM.createTextNode('');
   observer.observe(node, {characterData: true});
   return function requestFlush() {
     toggle = -toggle;
@@ -43,12 +44,7 @@ export class TaskQueue {
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
 
-    if (typeof BrowserMutationObserver === 'function') {
-      this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(() => this.flushMicroTaskQueue());
-    }else {
-      this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(() => this.flushMicroTaskQueue());
-    }
-
+    this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(() => this.flushMicroTaskQueue());
     this.requestFlushTaskQueue = makeRequestFlushFromTimer(() => this.flushTaskQueue());
   }
 

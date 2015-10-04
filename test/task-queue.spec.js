@@ -1,6 +1,9 @@
 import {TaskQueue} from '../src/index';
+import {initialize} from 'aurelia-pal-browser';
 
 describe('task queue', () => {
+
+  beforeAll(() => initialize());
 
   it("does not provide immediate execution", () => {
 
