@@ -34,6 +34,16 @@ function makeRequestFlushFromTimer(flush) {
   };
 }
 
+function onError(error, task) {
+  if ('onError' in task) {
+    task.onError(error);
+  } else if (hasSetImmediate) {
+    setImmediate(() => { throw error; });
+  } else {
+    setTimeout(() => { throw error; }, 0);
+  }
+}
+
 interface Callable {
   call(): void;
 }
@@ -78,7 +88,7 @@ export class TaskQueue {
         index++;
       }
     } catch (error) {
-      this.onError(error, task);
+      onError(error, task);
     }
   }
 
@@ -111,19 +121,9 @@ export class TaskQueue {
         }
       }
     } catch (error) {
-      this.onError(error, task);
+      onError(error, task);
     }
 
     queue.length = 0;
-  }
-
-  onError(error: Error, task: Callable | Function): void {
-    if ('onError' in task) {
-      task.onError(error);
-    } else if (hasSetImmediate) {
-      setImmediate(() => { throw error; });
-    } else {
-      setTimeout(() => { throw error; }, 0);
-    }
   }
 }
