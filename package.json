@@ -1,6 +1,6 @@
 {
   "name": "aurelia-task-queue",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "A simple task queue for the browser that enables the queuing of both standard tasks and micro tasks.",
   "keywords": [
     "aurelia",
@@ -26,15 +26,13 @@
       "lib": "dist/amd"
     },
     "dependencies": {
-      "aurelia-pal": "github:aurelia/pal@^0.1.7"
+      "aurelia-pal": "github:aurelia/pal@^0.2.0"
     },
     "devDependencies": {
-      "aurelia-pal-browser": "github:aurelia/pal-browser@^0.1.11",
+      "aurelia-pal-browser": "github:aurelia/pal-browser@^0.2.0",
       "babel": "npm:babel-core@^5.1.13",
       "babel-runtime": "npm:babel-runtime@^5.1.13",
-      "core-js": "npm:core-js@^0.9.5",
-      "traceur": "github:jmcriffey/bower-traceur@0.0.91",
-      "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.91"
+      "core-js": "npm:core-js@^0.9.5"
     }
   },
   "devDependencies": {
@@ -65,32 +63,8 @@
     "yargs": "^2.1.1"
   },
   "aurelia": {
-    "usedBy": [
-      "aurelia-binding",
-      "aurelia-framework",
-      "aurelia-templating"
-    ],
     "documentation": {
-      "links": [
-        {
-          "rel": "license",
-          "mediaType": "text/plain",
-          "title": "The MIT License (MIT)",
-          "href": "LICENSE"
-        },
-        {
-          "rel": "describedby",
-          "mediaType": "application/aurelia-doc+json",
-          "title": "API",
-          "href": "doc/api.json"
-        },
-        {
-          "rel": "version-history",
-          "mediaType": "text/markdown",
-          "title": "Change Log",
-          "href": "doc/CHANGELOG.md"
-        }
-      ]
+      "articles": []
     }
   }
 }

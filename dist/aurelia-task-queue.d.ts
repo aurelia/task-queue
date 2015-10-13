@@ -1,4 +1,5 @@
 declare module 'aurelia-task-queue' {
+  import { DOM }  from 'aurelia-pal';
   export interface Callable {
     call(): void;
   }
@@ -8,6 +9,5 @@ declare module 'aurelia-task-queue' {
     queueTask(task: Callable | Function): void;
     flushTaskQueue(): void;
     flushMicroTaskQueue(): void;
-    onError(error: Error, task: Callable | Function): void;
   }
 }

@@ -1,10 +1,11 @@
-let BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+import {DOM} from 'aurelia-pal';
+
 let hasSetImmediate = typeof setImmediate === 'function';
 
 function makeRequestFlushFromMutationObserver(flush) {
   let toggle = 1;
-  let observer = new BrowserMutationObserver(flush);
-  let node = document.createTextNode('');
+  let observer = DOM.createMutationObserver(flush);
+  let node = DOM.createTextNode('');
   observer.observe(node, {characterData: true});
   return function requestFlush() {
     toggle = -toggle;
@@ -33,6 +34,16 @@ function makeRequestFlushFromTimer(flush) {
   };
 }
 
+function onError(error, task) {
+  if ('onError' in task) {
+    task.onError(error);
+  } else if (hasSetImmediate) {
+    setImmediate(() => { throw error; });
+  } else {
+    setTimeout(() => { throw error; }, 0);
+  }
+}
+
 interface Callable {
   call(): void;
 }
@@ -43,12 +54,7 @@ export class TaskQueue {
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
 
-    if (typeof BrowserMutationObserver === 'function') {
-      this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(() => this.flushMicroTaskQueue());
-    }else {
-      this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(() => this.flushMicroTaskQueue());
-    }
-
+    this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(() => this.flushMicroTaskQueue());
     this.requestFlushTaskQueue = makeRequestFlushFromTimer(() => this.flushTaskQueue());
   }
 
@@ -82,7 +88,7 @@ export class TaskQueue {
         index++;
       }
     } catch (error) {
-      this.onError(error, task);
+      onError(error, task);
     }
   }
 
@@ -115,19 +121,9 @@ export class TaskQueue {
         }
       }
     } catch (error) {
-      this.onError(error, task);
+      onError(error, task);
     }
 
     queue.length = 0;
-  }
-
-  onError(error: Error, task: Callable | Function): void {
-    if ('onError' in task) {
-      task.onError(error);
-    } else if (hasSetImmediate) {
-      setImmediate(() => { throw error; });
-    } else {
-      setTimeout(() => { throw error; }, 0);
-    }
   }
 }

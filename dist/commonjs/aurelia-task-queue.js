@@ -4,13 +4,14 @@ exports.__esModule = true;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+var _aureliaPal = require('aurelia-pal');
+
 var hasSetImmediate = typeof setImmediate === 'function';
 
 function makeRequestFlushFromMutationObserver(flush) {
   var toggle = 1;
-  var observer = new BrowserMutationObserver(flush);
-  var node = document.createTextNode('');
+  var observer = _aureliaPal.DOM.createMutationObserver(flush);
+  var node = _aureliaPal.DOM.createTextNode('');
   observer.observe(node, { characterData: true });
   return function requestFlush() {
     toggle = -toggle;
@@ -31,6 +32,20 @@ function makeRequestFlushFromTimer(flush) {
   };
 }
 
+function onError(error, task) {
+  if ('onError' in task) {
+    task.onError(error);
+  } else if (hasSetImmediate) {
+    setImmediate(function () {
+      throw error;
+    });
+  } else {
+    setTimeout(function () {
+      throw error;
+    }, 0);
+  }
+}
+
 var TaskQueue = (function () {
   function TaskQueue() {
     var _this = this;
@@ -41,16 +56,9 @@ var TaskQueue = (function () {
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
 
-    if (typeof BrowserMutationObserver === 'function') {
-      this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
-        return _this.flushMicroTaskQueue();
-      });
-    } else {
-      this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(function () {
-        return _this.flushMicroTaskQueue();
-      });
-    }
-
+    this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
+      return _this.flushMicroTaskQueue();
+    });
     this.requestFlushTaskQueue = makeRequestFlushFromTimer(function () {
       return _this.flushTaskQueue();
     });
@@ -86,7 +94,7 @@ var TaskQueue = (function () {
         index++;
       }
     } catch (error) {
-      this.onError(error, task);
+      onError(error, task);
     }
   };
 
@@ -112,24 +120,10 @@ var TaskQueue = (function () {
         }
       }
     } catch (error) {
-      this.onError(error, task);
+      onError(error, task);
     }
 
     queue.length = 0;
-  };
-
-  TaskQueue.prototype.onError = function onError(error, task) {
-    if ('onError' in task) {
-      task.onError(error);
-    } else if (hasSetImmediate) {
-      setImmediate(function () {
-        throw error;
-      });
-    } else {
-      setTimeout(function () {
-        throw error;
-      }, 0);
-    }
   };
 
   return TaskQueue;

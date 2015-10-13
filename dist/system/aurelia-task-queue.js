@@ -1,14 +1,14 @@
-System.register([], function (_export) {
+System.register(['aurelia-pal'], function (_export) {
   'use strict';
 
-  var BrowserMutationObserver, hasSetImmediate, TaskQueue;
+  var DOM, hasSetImmediate, TaskQueue;
 
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function makeRequestFlushFromMutationObserver(flush) {
     var toggle = 1;
-    var observer = new BrowserMutationObserver(flush);
-    var node = document.createTextNode('');
+    var observer = DOM.createMutationObserver(flush);
+    var node = DOM.createTextNode('');
     observer.observe(node, { characterData: true });
     return function requestFlush() {
       toggle = -toggle;
@@ -29,10 +29,25 @@ System.register([], function (_export) {
     };
   }
 
+  function onError(error, task) {
+    if ('onError' in task) {
+      task.onError(error);
+    } else if (hasSetImmediate) {
+      setImmediate(function () {
+        throw error;
+      });
+    } else {
+      setTimeout(function () {
+        throw error;
+      }, 0);
+    }
+  }
+
   return {
-    setters: [],
+    setters: [function (_aureliaPal) {
+      DOM = _aureliaPal.DOM;
+    }],
     execute: function () {
-      BrowserMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
       hasSetImmediate = typeof setImmediate === 'function';
 
       TaskQueue = (function () {
@@ -45,16 +60,9 @@ System.register([], function (_export) {
           this.microTaskQueueCapacity = 1024;
           this.taskQueue = [];
 
-          if (typeof BrowserMutationObserver === 'function') {
-            this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
-              return _this.flushMicroTaskQueue();
-            });
-          } else {
-            this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(function () {
-              return _this.flushMicroTaskQueue();
-            });
-          }
-
+          this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
+            return _this.flushMicroTaskQueue();
+          });
           this.requestFlushTaskQueue = makeRequestFlushFromTimer(function () {
             return _this.flushTaskQueue();
           });
@@ -90,7 +98,7 @@ System.register([], function (_export) {
               index++;
             }
           } catch (error) {
-            this.onError(error, task);
+            onError(error, task);
           }
         };
 
@@ -116,24 +124,10 @@ System.register([], function (_export) {
               }
             }
           } catch (error) {
-            this.onError(error, task);
+            onError(error, task);
           }
 
           queue.length = 0;
-        };
-
-        TaskQueue.prototype.onError = function onError(error, task) {
-          if ('onError' in task) {
-            task.onError(error);
-          } else if (hasSetImmediate) {
-            setImmediate(function () {
-              throw error;
-            });
-          } else {
-            setTimeout(function () {
-              throw error;
-            }, 0);
-          }
         };
 
         return TaskQueue;

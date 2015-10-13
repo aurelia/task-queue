@@ -83,62 +83,6 @@
           ]
         },
         {
-          "id": 19,
-          "name": "onError",
-          "kind": 2048,
-          "kindString": "Method",
-          "flags": {
-            "isExported": true
-          },
-          "signatures": [
-            {
-              "id": 20,
-              "name": "onError",
-              "kind": 4096,
-              "kindString": "Call signature",
-              "flags": {},
-              "parameters": [
-                {
-                  "id": 21,
-                  "name": "error",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "reference",
-                    "name": "Error"
-                  }
-                },
-                {
-                  "id": 22,
-                  "name": "task",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "union",
-                    "types": [
-                      {
-                        "type": "reference",
-                        "name": "Callable",
-                        "id": 3
-                      },
-                      {
-                        "type": "reference",
-                        "name": "Function"
-                      }
-                    ]
-                  }
-                }
-              ],
-              "type": {
-                "type": "instrinct",
-                "name": "void"
-              }
-            }
-          ]
-        },
-        {
           "id": 9,
           "name": "queueMicroTask",
           "kind": 2048,
@@ -243,7 +187,6 @@
           "children": [
             17,
             15,
-            19,
             9,
             12
           ]
