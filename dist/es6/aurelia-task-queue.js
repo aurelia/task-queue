@@ -44,11 +44,23 @@ function onError(error, task) {
   }
 }
 
+/**
+* Something that is callable. Either a Function or a class with a call method.
+*/
 interface Callable {
+  /**
+  * Call it.
+  */
   call(): void;
 }
 
+/**
+* Implements an asynchronous task queue.
+*/
 export class TaskQueue {
+  /**
+  * Creates an instance of TaskQueue.
+  */
   constructor() {
     this.microTaskQueue = [];
     this.microTaskQueueCapacity = 1024;
@@ -58,6 +70,10 @@ export class TaskQueue {
     this.requestFlushTaskQueue = makeRequestFlushFromTimer(() => this.flushTaskQueue());
   }
 
+  /**
+  * Queues a task on the micro task queue for ASAP execution.
+  * @param task The task to queue up for ASAP execution.
+  */
   queueMicroTask(task: Callable | Function): void {
     if (this.microTaskQueue.length < 1) {
       this.requestFlushMicroTaskQueue();
@@ -66,6 +82,10 @@ export class TaskQueue {
     this.microTaskQueue.push(task);
   }
 
+  /**
+  * Queues a task on the macro task queue for turn-based execution.
+  * @param task The task to queue up for turn-based execution.
+  */
   queueTask(task: Callable | Function): void {
     if (this.taskQueue.length < 1) {
       this.requestFlushTaskQueue();
@@ -74,6 +94,9 @@ export class TaskQueue {
     this.taskQueue.push(task);
   }
 
+  /**
+  * Immediately flushes the task queue.
+  */
   flushTaskQueue(): void {
     let queue = this.taskQueue;
     let index = 0;
@@ -92,6 +115,9 @@ export class TaskQueue {
     }
   }
 
+  /**
+  * Immediately flushes the micro task queue.
+  */
   flushMicroTaskQueue(): void {
     let queue = this.microTaskQueue;
     let capacity = this.microTaskQueueCapacity;
