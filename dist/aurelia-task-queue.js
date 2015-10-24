@@ -136,9 +136,9 @@ export class TaskQueue {
         // shift MicroTasks off the queue after they have been executed.
         // Instead, we periodically shift 1024 MicroTasks off the queue.
         if (index > capacity) {
-            // Manually shift all values starting at the index back to the
-            // beginning of the queue.
-          for (let scan = 0; scan < index; scan++) {
+          // Manually shift all values starting at the index back to the
+          // beginning of the queue.
+          for (let scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
             queue[scan] = queue[scan + index];
           }
 

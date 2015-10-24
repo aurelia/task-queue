@@ -111,7 +111,7 @@ var TaskQueue = (function () {
         index++;
 
         if (index > capacity) {
-          for (var scan = 0; scan < index; scan++) {
+          for (var scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
             queue[scan] = queue[scan + index];
           }
 

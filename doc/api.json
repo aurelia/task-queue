@@ -13,6 +13,9 @@
       "flags": {
         "isExported": true
       },
+      "comment": {
+        "shortText": "Implements an asynchronous task queue."
+      },
       "children": [
         {
           "id": 7,
@@ -22,6 +25,9 @@
           "flags": {
             "isExported": true
           },
+          "comment": {
+            "shortText": "Creates an instance of TaskQueue."
+          },
           "signatures": [
             {
               "id": 8,
@@ -29,6 +35,9 @@
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
+              "comment": {
+                "shortText": "Creates an instance of TaskQueue."
+              },
               "type": {
                 "type": "reference",
                 "name": "TaskQueue",
@@ -53,6 +62,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Immediately flushes the micro task queue."
+              },
               "type": {
                 "type": "instrinct",
                 "name": "void"
@@ -75,6 +87,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Immediately flushes the task queue."
+              },
               "type": {
                 "type": "instrinct",
                 "name": "void"
@@ -97,6 +112,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Queues a task on the micro task queue for ASAP execution."
+              },
               "parameters": [
                 {
                   "id": 11,
@@ -104,6 +122,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "text": "The task to queue up for ASAP execution.\n"
+                  },
                   "type": {
                     "type": "union",
                     "types": [
@@ -142,6 +163,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Queues a task on the macro task queue for turn-based execution."
+              },
               "parameters": [
                 {
                   "id": 14,
@@ -149,6 +173,9 @@
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
+                  "comment": {
+                    "text": "The task to queue up for turn-based execution.\n"
+                  },
                   "type": {
                     "type": "union",
                     "types": [
@@ -200,6 +227,9 @@
       "kindString": "Interface",
       "flags": {
         "isExported": true
+      },
+      "comment": {
+        "shortText": "Something that is callable. Either a Function or a class with a call method."
       },
       "children": [
         {
