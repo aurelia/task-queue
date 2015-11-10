@@ -1,3 +1,11 @@
+## 0.9.0 (2015-11-10)
+
+
+#### Bug Fixes
+
+* **task-queue:** queue can be effectively overflown ([9a8f7583](http://github.com/aurelia/task-queue/commit/9a8f7583b06ff0295a7f5a41ffec9dd7bcf02755), closes [#7](http://github.com/aurelia/task-queue/issues/7))
+
+
 ## 0.8.0 (2015-10-13)
 
 
