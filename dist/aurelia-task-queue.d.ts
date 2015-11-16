@@ -5,6 +5,10 @@ declare module 'aurelia-task-queue' {
   * Something that is callable. Either a Function or a class with a call method.
   */
   export interface Callable {
+    
+    /**
+      * Call it.
+      */
     call(): void;
   }
   

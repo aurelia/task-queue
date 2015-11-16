@@ -247,6 +247,9 @@
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
+              "comment": {
+                "shortText": "Call it."
+              },
               "type": {
                 "type": "instrinct",
                 "name": "void"
