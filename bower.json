@@ -18,6 +18,6 @@
     "url": "http://github.com/aurelia/task-queue"
   },
   "dependencies": {
-    "aurelia-pal": "^0.3.0"
+    "aurelia-pal": "^1.0.0-beta.1"
   }
 }
