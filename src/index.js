@@ -1,4 +1,4 @@
-import {DOM} from 'aurelia-pal';
+import {DOM, FEATURE} from 'aurelia-pal';
 
 let hasSetImmediate = typeof setImmediate === 'function';
 
@@ -66,7 +66,12 @@ export class TaskQueue {
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
 
-    this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(() => this.flushMicroTaskQueue());
+    if (FEATURE.mutationObserver) {
+      this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(() => this.flushMicroTaskQueue());
+    } else {
+      this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(() => this.flushMicroTaskQueue());
+    }
+
     this.requestFlushTaskQueue = makeRequestFlushFromTimer(() => this.flushTaskQueue());
   }
 
