@@ -1,5 +1,5 @@
 declare module 'aurelia-task-queue' {
-  import { DOM }  from 'aurelia-pal';
+  import { DOM, FEATURE }  from 'aurelia-pal';
   
   /**
   * Something that is callable. Either a Function or a class with a call method.

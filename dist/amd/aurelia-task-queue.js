@@ -55,9 +55,16 @@ define(['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
       this.microTaskQueueCapacity = 1024;
       this.taskQueue = [];
 
-      this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
-        return _this.flushMicroTaskQueue();
-      });
+      if (_aureliaPal.FEATURE.mutationObserver) {
+        this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
+          return _this.flushMicroTaskQueue();
+        });
+      } else {
+        this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(function () {
+          return _this.flushMicroTaskQueue();
+        });
+      }
+
       this.requestFlushTaskQueue = makeRequestFlushFromTimer(function () {
         return _this.flushTaskQueue();
       });

@@ -1,3 +1,17 @@
+### 1.0.0-beta.1.1.0 (2016-01-29)
+
+
+#### Bug Fixes
+
+* **index:** enable running without mutation observers ([7d0c1336](http://github.com/aurelia/task-queue/commit/7d0c133647f06f0ce81b833342f514f567c9f8b1), closes [#10](http://github.com/aurelia/task-queue/issues/10))
+* **package:** correct missed dependency update ([896972b3](http://github.com/aurelia/task-queue/commit/896972b36c814e0140c7f4106586ab0866099517))
+
+
+#### Features
+
+* **all:** update jspm meta; core-js; aurelia deps ([38b78a66](http://github.com/aurelia/task-queue/commit/38b78a66c643d0056efdcd0abf5a0ac0a83a3b84))
+
+
 ### 1.0.0-beta.1 (2015-11-16)
 
 
