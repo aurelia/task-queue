@@ -130,7 +130,7 @@
                     "types": [
                       {
                         "type": "reference",
-                        "name": "Callable",
+                        "name": "Task",
                         "id": 3
                       },
                       {
@@ -181,7 +181,7 @@
                     "types": [
                       {
                         "type": "reference",
-                        "name": "Callable",
+                        "name": "Task",
                         "id": 3
                       },
                       {
@@ -222,14 +222,14 @@
     },
     {
       "id": 3,
-      "name": "Callable",
+      "name": "Task",
       "kind": 256,
       "kindString": "Interface",
       "flags": {
         "isExported": true
       },
       "comment": {
-        "shortText": "Something that is callable. Either a Function or a class with a call method."
+        "shortText": "Either a Function or a class with a call method that will do work when dequeued."
       },
       "children": [
         {

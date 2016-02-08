@@ -45,9 +45,9 @@ function onError(error, task) {
 }
 
 /**
-* Something that is callable. Either a Function or a class with a call method.
+* Either a Function or a class with a call method that will do work when dequeued.
 */
-interface Callable {
+interface Task {
   /**
   * Call it.
   */
@@ -79,7 +79,7 @@ export class TaskQueue {
   * Queues a task on the micro task queue for ASAP execution.
   * @param task The task to queue up for ASAP execution.
   */
-  queueMicroTask(task: Callable | Function): void {
+  queueMicroTask(task: Task | Function): void {
     if (this.microTaskQueue.length < 1) {
       this.requestFlushMicroTaskQueue();
     }
@@ -91,7 +91,7 @@ export class TaskQueue {
   * Queues a task on the macro task queue for turn-based execution.
   * @param task The task to queue up for turn-based execution.
   */
-  queueTask(task: Callable | Function): void {
+  queueTask(task: Task | Function): void {
     if (this.taskQueue.length < 1) {
       this.requestFlushTaskQueue();
     }

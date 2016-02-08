@@ -1,3 +1,11 @@
+### 1.0.0-beta.1.1.1 (2016-02-08)
+
+
+#### Bug Fixes
+
+* **index:** rename Callable to Task ([5e5e3a96](http://github.com/aurelia/task-queue/commit/5e5e3a96ee4da108310ad3e651f31ebd06f339dd))
+
+
 ### 1.0.0-beta.1.1.0 (2016-01-29)
 
 
