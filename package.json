@@ -30,6 +30,9 @@
     "peerDependencies": {
       "aurelia-pal": "^1.0.0-beta.1.1.1"
     },
+    "dependencies": {
+      "aurelia-pal": "^1.0.0-beta.1.1.1"
+    },
     "devDependencies": {
       "aurelia-pal-browser": "^1.0.0-beta.1.1.2",
       "babel": "babel-core@^5.1.13",
@@ -37,7 +40,7 @@
       "core-js": "^2.0.3"
     }
   },
-  "peerDependencies": {
+  "dependencies": {
     "aurelia-pal": "^1.0.0-beta.1.1.1"
   },
   "devDependencies": {
