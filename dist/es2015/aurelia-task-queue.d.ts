@@ -1,5 +1,8 @@
 declare module 'aurelia-task-queue' {
-  import { DOM, FEATURE }  from 'aurelia-pal';
+  import {
+    DOM,
+    FEATURE
+  } from 'aurelia-pal';
   
   /**
   * Either a Function or a class with a call method that will do work when dequeued.
@@ -12,6 +15,9 @@ declare module 'aurelia-task-queue' {
     call(): void;
   }
   
+  /**
+  * Implements an asynchronous task queue.
+  */
   /**
   * Implements an asynchronous task queue.
   */

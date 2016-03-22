@@ -1,9 +1,13 @@
-System.register(['aurelia-pal'], function (_export) {
-  'use strict';
+'use strict';
 
+System.register(['aurelia-pal'], function (_export, _context) {
   var DOM, FEATURE, hasSetImmediate, TaskQueue;
 
-  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
 
   function makeRequestFlushFromMutationObserver(flush) {
     var toggle = 1;
@@ -51,7 +55,7 @@ System.register(['aurelia-pal'], function (_export) {
     execute: function () {
       hasSetImmediate = typeof setImmediate === 'function';
 
-      TaskQueue = (function () {
+      _export('TaskQueue', TaskQueue = function () {
         function TaskQueue() {
           var _this = this;
 
@@ -95,7 +99,7 @@ System.register(['aurelia-pal'], function (_export) {
         TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
           var queue = this.taskQueue;
           var index = 0;
-          var task = undefined;
+          var task = void 0;
 
           this.taskQueue = [];
 
@@ -114,7 +118,7 @@ System.register(['aurelia-pal'], function (_export) {
           var queue = this.microTaskQueue;
           var capacity = this.microTaskQueueCapacity;
           var index = 0;
-          var task = undefined;
+          var task = void 0;
 
           try {
             while (index < queue.length) {
@@ -139,7 +143,7 @@ System.register(['aurelia-pal'], function (_export) {
         };
 
         return TaskQueue;
-      })();
+      }());
 
       _export('TaskQueue', TaskQueue);
     }

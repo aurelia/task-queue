@@ -1,9 +1,16 @@
 define(['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
 
-  exports.__esModule = true;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.TaskQueue = undefined;
 
-  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
 
   var hasSetImmediate = typeof setImmediate === 'function';
 
@@ -45,7 +52,7 @@ define(['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
     }
   }
 
-  var TaskQueue = (function () {
+  var TaskQueue = exports.TaskQueue = function () {
     function TaskQueue() {
       var _this = this;
 
@@ -89,7 +96,7 @@ define(['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
     TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
       var queue = this.taskQueue;
       var index = 0;
-      var task = undefined;
+      var task = void 0;
 
       this.taskQueue = [];
 
@@ -108,7 +115,7 @@ define(['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
       var queue = this.microTaskQueue;
       var capacity = this.microTaskQueueCapacity;
       var index = 0;
-      var task = undefined;
+      var task = void 0;
 
       try {
         while (index < queue.length) {
@@ -133,7 +140,5 @@ define(['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
     };
 
     return TaskQueue;
-  })();
-
-  exports.TaskQueue = TaskQueue;
+  }();
 });
