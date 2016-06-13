@@ -1,20 +1,13 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.TaskQueue = undefined;
-
-var _aureliaPal = require('aurelia-pal');
 
 
+import { DOM, FEATURE } from 'aurelia-pal';
 
 var hasSetImmediate = typeof setImmediate === 'function';
 
 function makeRequestFlushFromMutationObserver(flush) {
   var toggle = 1;
-  var observer = _aureliaPal.DOM.createMutationObserver(flush);
-  var node = _aureliaPal.DOM.createTextNode('');
+  var observer = DOM.createMutationObserver(flush);
+  var node = DOM.createTextNode('');
   observer.observe(node, { characterData: true });
   return function requestFlush() {
     toggle = -toggle;
@@ -49,7 +42,7 @@ function onError(error, task) {
   }
 }
 
-var TaskQueue = exports.TaskQueue = function () {
+export var TaskQueue = function () {
   function TaskQueue() {
     var _this = this;
 
@@ -59,7 +52,7 @@ var TaskQueue = exports.TaskQueue = function () {
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
 
-    if (_aureliaPal.FEATURE.mutationObserver) {
+    if (FEATURE.mutationObserver) {
       this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
         return _this.flushMicroTaskQueue();
       });

@@ -6,11 +6,7 @@ define(['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   });
   exports.TaskQueue = undefined;
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
+  
 
   var hasSetImmediate = typeof setImmediate === 'function';
 
@@ -56,7 +52,7 @@ define(['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
     function TaskQueue() {
       var _this = this;
 
-      _classCallCheck(this, TaskQueue);
+      
 
       this.microTaskQueue = [];
       this.microTaskQueueCapacity = 1024;

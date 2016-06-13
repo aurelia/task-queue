@@ -1,13 +1,11 @@
 'use strict';
 
 System.register(['aurelia-pal'], function (_export, _context) {
+  "use strict";
+
   var DOM, FEATURE, hasSetImmediate, TaskQueue;
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
+  
 
   function makeRequestFlushFromMutationObserver(flush) {
     var toggle = 1;
@@ -59,7 +57,7 @@ System.register(['aurelia-pal'], function (_export, _context) {
         function TaskQueue() {
           var _this = this;
 
-          _classCallCheck(this, TaskQueue);
+          
 
           this.microTaskQueue = [];
           this.microTaskQueueCapacity = 1024;

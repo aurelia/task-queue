@@ -1,4 +1,4 @@
-import {DOM, FEATURE} from 'aurelia-pal';
+import {DOM,FEATURE} from 'aurelia-pal';
 
 let hasSetImmediate = typeof setImmediate === 'function';
 
