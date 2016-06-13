@@ -1,6 +1,6 @@
 {
   "name": "aurelia-task-queue",
-  "version": "1.0.0-beta.1.2.1",
+  "version": "1.0.0-beta.2.0.0",
   "description": "A simple task queue for the browser that enables the queuing of both standard tasks and micro tasks.",
   "keywords": [
     "aurelia",
