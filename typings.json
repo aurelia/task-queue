@@ -1,0 +1,4 @@
+{
+  "name": "aurelia-task-queue",
+  "main": "dist/aurelia-task-queue.d.ts"
+}
