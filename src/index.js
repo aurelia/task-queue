@@ -1,6 +1,7 @@
 import {DOM, FEATURE} from 'aurelia-pal';
 
 let hasSetImmediate = typeof setImmediate === 'function';
+const microTaskQueueCapacity = 1024;
 
 function makeRequestFlushFromMutationObserver(flush) {
   let toggle = 1;
@@ -63,7 +64,6 @@ export class TaskQueue {
   */
   constructor() {
     this.microTaskQueue = [];
-    this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
 
     if (FEATURE.mutationObserver) {
@@ -125,7 +125,6 @@ export class TaskQueue {
   */
   flushMicroTaskQueue(): void {
     let queue = this.microTaskQueue;
-    let capacity = this.microTaskQueueCapacity;
     let index = 0;
     let task;
 
@@ -140,7 +139,7 @@ export class TaskQueue {
         // grow, but to avoid an O(n) walk for every MicroTask we execute, we don't
         // shift MicroTasks off the queue after they have been executed.
         // Instead, we periodically shift 1024 MicroTasks off the queue.
-        if (index > capacity) {
+        if (index > microTaskQueueCapacity) {
           // Manually shift all values starting at the index back to the
           // beginning of the queue.
           for (let scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
