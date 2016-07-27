@@ -5,7 +5,7 @@ define(['exports', './aurelia-task-queue'], function (exports, _aureliaTaskQueue
     value: true
   });
   Object.keys(_aureliaTaskQueue).forEach(function (key) {
-    if (key === "default") return;
+    if (key === "default" || key === "__esModule") return;
     Object.defineProperty(exports, key, {
       enumerable: true,
       get: function () {

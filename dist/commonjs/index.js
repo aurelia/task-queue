@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", {
 var _aureliaTaskQueue = require('./aurelia-task-queue');
 
 Object.keys(_aureliaTaskQueue).forEach(function (key) {
-  if (key === "default") return;
+  if (key === "default" || key === "__esModule") return;
   Object.defineProperty(exports, key, {
     enumerable: true,
     get: function get() {
