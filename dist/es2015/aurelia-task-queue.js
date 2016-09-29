@@ -42,6 +42,8 @@ function onError(error, task) {
 
 export let TaskQueue = class TaskQueue {
   constructor() {
+    this.flushing = false;
+
     this.microTaskQueue = [];
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
@@ -79,6 +81,7 @@ export let TaskQueue = class TaskQueue {
     this.taskQueue = [];
 
     try {
+      this.flushing = true;
       while (index < queue.length) {
         task = queue[index];
         task.call();
@@ -86,6 +89,8 @@ export let TaskQueue = class TaskQueue {
       }
     } catch (error) {
       onError(error, task);
+    } finally {
+      this.flushing = false;
     }
   }
 
@@ -96,6 +101,7 @@ export let TaskQueue = class TaskQueue {
     let task;
 
     try {
+      this.flushing = true;
       while (index < queue.length) {
         task = queue[index];
         task.call();
@@ -112,6 +118,8 @@ export let TaskQueue = class TaskQueue {
       }
     } catch (error) {
       onError(error, task);
+    } finally {
+      this.flushing = false;
     }
 
     queue.length = 0;
