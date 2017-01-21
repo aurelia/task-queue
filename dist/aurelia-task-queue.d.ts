@@ -23,6 +23,11 @@ export declare interface Task {
 export declare class TaskQueue {
   
   /**
+     * Whether the queue is in the process of flushing.
+     */
+  flushing: any;
+  
+  /**
     * Creates an instance of TaskQueue.
     */
   constructor();

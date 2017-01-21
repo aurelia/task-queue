@@ -59,6 +59,8 @@ System.register(['aurelia-pal'], function (_export, _context) {
 
           
 
+          this.flushing = false;
+
           this.microTaskQueue = [];
           this.microTaskQueueCapacity = 1024;
           this.taskQueue = [];
@@ -102,6 +104,7 @@ System.register(['aurelia-pal'], function (_export, _context) {
           this.taskQueue = [];
 
           try {
+            this.flushing = true;
             while (index < queue.length) {
               task = queue[index];
               task.call();
@@ -109,6 +112,8 @@ System.register(['aurelia-pal'], function (_export, _context) {
             }
           } catch (error) {
             onError(error, task);
+          } finally {
+            this.flushing = false;
           }
         };
 
@@ -119,6 +124,7 @@ System.register(['aurelia-pal'], function (_export, _context) {
           var task = void 0;
 
           try {
+            this.flushing = true;
             while (index < queue.length) {
               task = queue[index];
               task.call();
@@ -135,6 +141,8 @@ System.register(['aurelia-pal'], function (_export, _context) {
             }
           } catch (error) {
             onError(error, task);
+          } finally {
+            this.flushing = false;
           }
 
           queue.length = 0;

@@ -69,6 +69,11 @@ interface Task {
 */
 export class TaskQueue {
   /**
+   * Whether the queue is in the process of flushing.
+   */
+  flushing = false;
+
+  /**
   * Creates an instance of TaskQueue.
   */
   constructor() {
@@ -127,6 +132,7 @@ export class TaskQueue {
     this.taskQueue = []; //recursive calls to queueTask should be scheduled after the next cycle
 
     try {
+      this.flushing = true;
       while (index < queue.length) {
         task = queue[index];
         if (this.longStacks) {
@@ -137,6 +143,8 @@ export class TaskQueue {
       }
     } catch (error) {
       onError(error, task, this.longStacks);
+    } finally {
+      this.flushing = false;
     }
   }
 
@@ -150,6 +158,7 @@ export class TaskQueue {
     let task;
 
     try {
+      this.flushing = true;
       while (index < queue.length) {
         task = queue[index];
         if (this.longStacks) {
@@ -176,6 +185,8 @@ export class TaskQueue {
       }
     } catch (error) {
       onError(error, task, this.longStacks);
+    } finally {
+      this.flushing = false;
     }
 
     queue.length = 0;

@@ -55,6 +55,8 @@ var TaskQueue = exports.TaskQueue = function () {
 
     
 
+    this.flushing = false;
+
     this.microTaskQueue = [];
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
@@ -98,6 +100,7 @@ var TaskQueue = exports.TaskQueue = function () {
     this.taskQueue = [];
 
     try {
+      this.flushing = true;
       while (index < queue.length) {
         task = queue[index];
         task.call();
@@ -105,6 +108,8 @@ var TaskQueue = exports.TaskQueue = function () {
       }
     } catch (error) {
       onError(error, task);
+    } finally {
+      this.flushing = false;
     }
   };
 
@@ -115,6 +120,7 @@ var TaskQueue = exports.TaskQueue = function () {
     var task = void 0;
 
     try {
+      this.flushing = true;
       while (index < queue.length) {
         task = queue[index];
         task.call();
@@ -131,6 +137,8 @@ var TaskQueue = exports.TaskQueue = function () {
       }
     } catch (error) {
       onError(error, task);
+    } finally {
+      this.flushing = false;
     }
 
     queue.length = 0;
