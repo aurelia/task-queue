@@ -1,8 +1,6 @@
 import {DOM, FEATURE} from 'aurelia-pal';
 
 let hasSetImmediate = typeof setImmediate === 'function';
-// TODO: this has a perf cost, should be opt-in, maybe aurelia.use.developmentLogging()?
-let longStacks = true; 
 const stackSeparator = "\nEnqueued in TaskQueue by:\n";
 const microStackSeparator = "\nEnqueued in MicroTaskQueue by:\n";
 
@@ -38,7 +36,7 @@ function makeRequestFlushFromTimer(flush) {
   };
 }
 
-function onError(error, task) {
+function onError(error, task, longStacks) {
   if (longStacks && 
       task.stack &&
       typeof error === 'object' &&
@@ -77,6 +75,7 @@ export class TaskQueue {
     this.microTaskQueue = [];
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
+    this.longStacks = false;
 
     if (FEATURE.mutationObserver) {
       this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(() => this.flushMicroTaskQueue());
@@ -96,7 +95,7 @@ export class TaskQueue {
       this.requestFlushMicroTaskQueue();
     }
 
-    if (longStacks) {
+    if (this.longStacks) {
       task.stack = this.prepareQueueStack(microStackSeparator);
     }
     this.microTaskQueue.push(task);
@@ -111,7 +110,7 @@ export class TaskQueue {
       this.requestFlushTaskQueue();
     }
 
-    if (longStacks) {
+    if (this.longStacks) {
       task.stack = this.prepareQueueStack(stackSeparator);
     }
     this.taskQueue.push(task);
@@ -130,14 +129,14 @@ export class TaskQueue {
     try {
       while (index < queue.length) {
         task = queue[index];
-        if (longStacks) {
+        if (this.longStacks) {
           this.stack = typeof task.stack === "string" ? task.stack : undefined;
         }
         task.call();
         index++;
       }
     } catch (error) {
-      onError(error, task);
+      onError(error, task, this.longStacks);
     }
   }
 
@@ -153,7 +152,7 @@ export class TaskQueue {
     try {
       while (index < queue.length) {
         task = queue[index];
-        if (longStacks) {
+        if (this.longStacks) {
           this.stack = typeof task.stack === "string" ? task.stack : undefined;
         }
         task.call();
@@ -176,7 +175,7 @@ export class TaskQueue {
         }
       }
     } catch (error) {
-      onError(error, task);
+      onError(error, task, this.longStacks);
     }
 
     queue.length = 0;
