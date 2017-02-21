@@ -37,11 +37,11 @@ function makeRequestFlushFromTimer(flush) {
 }
 
 function onError(error, task, longStacks) {
-  if (longStacks && 
+  if (longStacks &&
       task.stack &&
       typeof error === 'object' &&
       error !== null) {
-    // Note: IE sets error.stack when throwing but does not override a defined .stack. 
+    // Note: IE sets error.stack when throwing but does not override a defined .stack.
     error.stack = filterFlushStack(error.stack) + task.stack;
   }
 
@@ -74,13 +74,17 @@ export class TaskQueue {
   flushing = false;
 
   /**
+   * Enables long stack traces for queued tasks.
+   */
+  longStacks = false;
+
+  /**
   * Creates an instance of TaskQueue.
   */
   constructor() {
     this.microTaskQueue = [];
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
-    this.longStacks = false;
 
     if (FEATURE.mutationObserver) {
       this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(() => this.flushMicroTaskQueue());
@@ -197,7 +201,7 @@ export class TaskQueue {
     if (typeof this.stack === "string") {
       stack = filterFlushStack(stack) + this.stack;
     }
-    return stack;    
+    return stack;
   }
 }
 
@@ -209,7 +213,7 @@ function captureStack() {
   }
   try {
     throw error;
-  } 
+  }
   catch (error) {
     return error.stack;
   }
@@ -228,7 +232,7 @@ function filterFlushStack(stack) {
     if (index < 0) {
       return stack;
     }
-  }    
+  }
   index = stack.lastIndexOf("\n", index);
   return index < 0 ? stack : stack.substr(0, index);
   // The following would work but without regex support to match from end of string,
