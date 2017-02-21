@@ -1,3 +1,13 @@
+<a name="1.2.0"></a>
+# [1.2.0](https://github.com/aurelia/task-queue/compare/1.1.0...v1.2.0) (2017-02-21)
+
+
+### Features
+
+* **index:** provide public api for enabling long stack traces ([352f50b](https://github.com/aurelia/task-queue/commit/352f50b))
+
+
+
 <a name="1.1.0"></a>
 # [1.1.0](https://github.com/aurelia/task-queue/compare/1.0.0...v1.1.0) (2016-09-29)
 

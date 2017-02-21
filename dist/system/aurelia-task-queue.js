@@ -3,7 +3,7 @@
 System.register(['aurelia-pal'], function (_export, _context) {
   "use strict";
 
-  var DOM, FEATURE, hasSetImmediate, TaskQueue;
+  var DOM, FEATURE, _typeof, hasSetImmediate, stackSeparator, microStackSeparator, TaskQueue;
 
   
 
@@ -31,7 +31,11 @@ System.register(['aurelia-pal'], function (_export, _context) {
     };
   }
 
-  function onError(error, task) {
+  function onError(error, task, longStacks) {
+    if (longStacks && task.stack && (typeof error === 'undefined' ? 'undefined' : _typeof(error)) === 'object' && error !== null) {
+      error.stack = filterFlushStack(error.stack) + task.stack;
+    }
+
     if ('onError' in task) {
       task.onError(error);
     } else if (hasSetImmediate) {
@@ -45,13 +49,49 @@ System.register(['aurelia-pal'], function (_export, _context) {
     }
   }
 
+  function captureStack() {
+    var error = new Error();
+
+    if (error.stack) {
+      return error.stack;
+    }
+
+    try {
+      throw error;
+    } catch (e) {
+      return e.stack;
+    }
+  }
+
+  function filterQueueStack(stack) {
+    return stack.replace(/^[\s\S]*?\bqueue(Micro)?Task\b[^\n]*\n/, '');
+  }
+
+  function filterFlushStack(stack) {
+    var index = stack.lastIndexOf('flushMicroTaskQueue');
+    if (index < 0) {
+      index = stack.lastIndexOf('flushTaskQueue');
+      if (index < 0) {
+        return stack;
+      }
+    }
+    index = stack.lastIndexOf('\n', index);
+    return index < 0 ? stack : stack.substr(0, index);
+  }
   return {
     setters: [function (_aureliaPal) {
       DOM = _aureliaPal.DOM;
       FEATURE = _aureliaPal.FEATURE;
     }],
     execute: function () {
+      _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+        return typeof obj;
+      } : function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+      };
       hasSetImmediate = typeof setImmediate === 'function';
+      stackSeparator = '\nEnqueued in TaskQueue by:\n';
+      microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
 
       _export('TaskQueue', TaskQueue = function () {
         function TaskQueue() {
@@ -60,6 +100,7 @@ System.register(['aurelia-pal'], function (_export, _context) {
           
 
           this.flushing = false;
+          this.longStacks = false;
 
           this.microTaskQueue = [];
           this.microTaskQueueCapacity = 1024;
@@ -85,6 +126,9 @@ System.register(['aurelia-pal'], function (_export, _context) {
             this.requestFlushMicroTaskQueue();
           }
 
+          if (this.longStacks) {
+            task.stack = this.prepareQueueStack(microStackSeparator);
+          }
           this.microTaskQueue.push(task);
         };
 
@@ -93,6 +137,9 @@ System.register(['aurelia-pal'], function (_export, _context) {
             this.requestFlushTaskQueue();
           }
 
+          if (this.longStacks) {
+            task.stack = this.prepareQueueStack(stackSeparator);
+          }
           this.taskQueue.push(task);
         };
 
@@ -107,11 +154,14 @@ System.register(['aurelia-pal'], function (_export, _context) {
             this.flushing = true;
             while (index < queue.length) {
               task = queue[index];
+              if (this.longStacks) {
+                this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+              }
               task.call();
               index++;
             }
           } catch (error) {
-            onError(error, task);
+            onError(error, task, this.longStacks);
           } finally {
             this.flushing = false;
           }
@@ -127,6 +177,9 @@ System.register(['aurelia-pal'], function (_export, _context) {
             this.flushing = true;
             while (index < queue.length) {
               task = queue[index];
+              if (this.longStacks) {
+                this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+              }
               task.call();
               index++;
 
@@ -140,12 +193,20 @@ System.register(['aurelia-pal'], function (_export, _context) {
               }
             }
           } catch (error) {
-            onError(error, task);
+            onError(error, task, this.longStacks);
           } finally {
             this.flushing = false;
           }
 
           queue.length = 0;
+        };
+
+        TaskQueue.prototype.prepareQueueStack = function prepareQueueStack(separator) {
+          var stack = separator + filterQueueStack(captureStack());
+          if (typeof this.stack === 'string') {
+            stack = filterFlushStack(stack) + this.stack;
+          }
+          return stack;
         };
 
         return TaskQueue;

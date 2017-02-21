@@ -1,6 +1,8 @@
 import { DOM, FEATURE } from 'aurelia-pal';
 
 let hasSetImmediate = typeof setImmediate === 'function';
+const stackSeparator = '\nEnqueued in TaskQueue by:\n';
+const microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
 
 function makeRequestFlushFromMutationObserver(flush) {
   let toggle = 1;
@@ -26,7 +28,11 @@ function makeRequestFlushFromTimer(flush) {
   };
 }
 
-function onError(error, task) {
+function onError(error, task, longStacks) {
+  if (longStacks && task.stack && typeof error === 'object' && error !== null) {
+    error.stack = filterFlushStack(error.stack) + task.stack;
+  }
+
   if ('onError' in task) {
     task.onError(error);
   } else if (hasSetImmediate) {
@@ -43,6 +49,7 @@ function onError(error, task) {
 export let TaskQueue = class TaskQueue {
   constructor() {
     this.flushing = false;
+    this.longStacks = false;
 
     this.microTaskQueue = [];
     this.microTaskQueueCapacity = 1024;
@@ -62,6 +69,9 @@ export let TaskQueue = class TaskQueue {
       this.requestFlushMicroTaskQueue();
     }
 
+    if (this.longStacks) {
+      task.stack = this.prepareQueueStack(microStackSeparator);
+    }
     this.microTaskQueue.push(task);
   }
 
@@ -70,6 +80,9 @@ export let TaskQueue = class TaskQueue {
       this.requestFlushTaskQueue();
     }
 
+    if (this.longStacks) {
+      task.stack = this.prepareQueueStack(stackSeparator);
+    }
     this.taskQueue.push(task);
   }
 
@@ -84,11 +97,14 @@ export let TaskQueue = class TaskQueue {
       this.flushing = true;
       while (index < queue.length) {
         task = queue[index];
+        if (this.longStacks) {
+          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+        }
         task.call();
         index++;
       }
     } catch (error) {
-      onError(error, task);
+      onError(error, task, this.longStacks);
     } finally {
       this.flushing = false;
     }
@@ -104,6 +120,9 @@ export let TaskQueue = class TaskQueue {
       this.flushing = true;
       while (index < queue.length) {
         task = queue[index];
+        if (this.longStacks) {
+          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+        }
         task.call();
         index++;
 
@@ -117,11 +136,49 @@ export let TaskQueue = class TaskQueue {
         }
       }
     } catch (error) {
-      onError(error, task);
+      onError(error, task, this.longStacks);
     } finally {
       this.flushing = false;
     }
 
     queue.length = 0;
   }
+
+  prepareQueueStack(separator) {
+    let stack = separator + filterQueueStack(captureStack());
+    if (typeof this.stack === 'string') {
+      stack = filterFlushStack(stack) + this.stack;
+    }
+    return stack;
+  }
 };
+
+function captureStack() {
+  let error = new Error();
+
+  if (error.stack) {
+    return error.stack;
+  }
+
+  try {
+    throw error;
+  } catch (e) {
+    return e.stack;
+  }
+}
+
+function filterQueueStack(stack) {
+  return stack.replace(/^[\s\S]*?\bqueue(Micro)?Task\b[^\n]*\n/, '');
+}
+
+function filterFlushStack(stack) {
+  let index = stack.lastIndexOf('flushMicroTaskQueue');
+  if (index < 0) {
+    index = stack.lastIndexOf('flushTaskQueue');
+    if (index < 0) {
+      return stack;
+    }
+  }
+  index = stack.lastIndexOf('\n', index);
+  return index < 0 ? stack : stack.substr(0, index);
+}

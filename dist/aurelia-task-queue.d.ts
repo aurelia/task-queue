@@ -28,6 +28,11 @@ export declare class TaskQueue {
   flushing: any;
   
   /**
+     * Enables long stack traces for queued tasks.
+     */
+  longStacks: any;
+  
+  /**
     * Creates an instance of TaskQueue.
     */
   constructor();
@@ -53,4 +58,5 @@ export declare class TaskQueue {
     * Immediately flushes the micro task queue.
     */
   flushMicroTaskQueue(): void;
+  prepareQueueStack(separator?: any): any;
 }
