@@ -96,6 +96,50 @@ export class TaskQueue {
   }
 
   /**
+  * Immediately flushes the queue.
+  * @param queue The task queue or micro task queue
+  * @param capacity For periodically shift 1024 MicroTasks off the queue
+  */
+  _flushQueue(queue, capacity): void {
+    let index = 0;
+    let task;
+
+    try {
+      this.flushing = true;
+      while (index < queue.length) {
+        task = queue[index];
+        if (this.longStacks) {
+          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+        }
+        task.call();
+        index++;
+
+        // Prevent leaking memory for long chains of recursive calls to `queueMicroTask`.
+        // If we call `queueMicroTask` within a MicroTask scheduled by `queueMicroTask`, the queue will
+        // grow, but to avoid an O(n) walk for every MicroTask we execute, we don't
+        // shift MicroTasks off the queue after they have been executed.
+        // Instead, we periodically shift 1024 MicroTasks off the queue.
+        if (capacity && index > capacity) {
+          // Manually shift all values starting at the index back to the
+          // beginning of the queue.
+          for (let scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
+            queue[scan] = queue[scan + index];
+          }
+
+          queue.length -= index;
+          index = 0;
+        }
+      }
+    } catch (error) {
+      onError(error, task, this.longStacks);
+    } finally {
+      this.flushing = false;
+    }
+
+    queue.length = 0;
+  }
+
+  /**
   * Queues a task on the micro task queue for ASAP execution.
   * @param task The task to queue up for ASAP execution.
   */
@@ -130,26 +174,9 @@ export class TaskQueue {
   */
   flushTaskQueue(): void {
     let queue = this.taskQueue;
-    let index = 0;
-    let task;
-
     this.taskQueue = []; //recursive calls to queueTask should be scheduled after the next cycle
 
-    try {
-      this.flushing = true;
-      while (index < queue.length) {
-        task = queue[index];
-        if (this.longStacks) {
-          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
-        }
-        task.call();
-        index++;
-      }
-    } catch (error) {
-      onError(error, task, this.longStacks);
-    } finally {
-      this.flushing = false;
-    }
+    this._flushQueue(queue);
   }
 
   /**
@@ -158,40 +185,8 @@ export class TaskQueue {
   flushMicroTaskQueue(): void {
     let queue = this.microTaskQueue;
     let capacity = this.microTaskQueueCapacity;
-    let index = 0;
-    let task;
 
-    try {
-      this.flushing = true;
-      while (index < queue.length) {
-        task = queue[index];
-        if (this.longStacks) {
-          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
-        }
-        task.call();
-        index++;
-
-        // Prevent leaking memory for long chains of recursive calls to `queueMicroTask`.
-        // If we call `queueMicroTask` within a MicroTask scheduled by `queueMicroTask`, the queue will
-        // grow, but to avoid an O(n) walk for every MicroTask we execute, we don't
-        // shift MicroTasks off the queue after they have been executed.
-        // Instead, we periodically shift 1024 MicroTasks off the queue.
-        if (index > capacity) {
-          // Manually shift all values starting at the index back to the
-          // beginning of the queue.
-          for (let scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
-            queue[scan] = queue[scan + index];
-          }
-
-          queue.length -= index;
-          index = 0;
-        }
-      }
-    } catch (error) {
-      onError(error, task, this.longStacks);
-    } finally {
-      this.flushing = false;
-    }
+    this._flushQueue(queue, capacity);
 
     queue.length = 0;
   }

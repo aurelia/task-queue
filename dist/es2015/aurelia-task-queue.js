@@ -64,6 +64,38 @@ export let TaskQueue = class TaskQueue {
     this.requestFlushTaskQueue = makeRequestFlushFromTimer(() => this.flushTaskQueue());
   }
 
+  _flushQueue(queue, capacity) {
+    let index = 0;
+    let task;
+
+    try {
+      this.flushing = true;
+      while (index < queue.length) {
+        task = queue[index];
+        if (this.longStacks) {
+          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+        }
+        task.call();
+        index++;
+
+        if (capacity && index > capacity) {
+          for (let scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
+            queue[scan] = queue[scan + index];
+          }
+
+          queue.length -= index;
+          index = 0;
+        }
+      }
+    } catch (error) {
+      onError(error, task, this.longStacks);
+    } finally {
+      this.flushing = false;
+    }
+
+    queue.length = 0;
+  }
+
   queueMicroTask(task) {
     if (this.microTaskQueue.length < 1) {
       this.requestFlushMicroTaskQueue();
@@ -88,58 +120,16 @@ export let TaskQueue = class TaskQueue {
 
   flushTaskQueue() {
     let queue = this.taskQueue;
-    let index = 0;
-    let task;
-
     this.taskQueue = [];
 
-    try {
-      this.flushing = true;
-      while (index < queue.length) {
-        task = queue[index];
-        if (this.longStacks) {
-          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
-        }
-        task.call();
-        index++;
-      }
-    } catch (error) {
-      onError(error, task, this.longStacks);
-    } finally {
-      this.flushing = false;
-    }
+    this._flushQueue(queue);
   }
 
   flushMicroTaskQueue() {
     let queue = this.microTaskQueue;
     let capacity = this.microTaskQueueCapacity;
-    let index = 0;
-    let task;
 
-    try {
-      this.flushing = true;
-      while (index < queue.length) {
-        task = queue[index];
-        if (this.longStacks) {
-          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
-        }
-        task.call();
-        index++;
-
-        if (index > capacity) {
-          for (let scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
-            queue[scan] = queue[scan + index];
-          }
-
-          queue.length -= index;
-          index = 0;
-        }
-      }
-    } catch (error) {
-      onError(error, task, this.longStacks);
-    } finally {
-      this.flushing = false;
-    }
+    this._flushQueue(queue, capacity);
 
     queue.length = 0;
   }

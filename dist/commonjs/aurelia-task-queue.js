@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TaskQueue = undefined;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _aureliaPal = require('aurelia-pal');
 
@@ -85,6 +85,38 @@ var TaskQueue = exports.TaskQueue = function () {
     });
   }
 
+  TaskQueue.prototype._flushQueue = function _flushQueue(queue, capacity) {
+    var index = 0;
+    var task = void 0;
+
+    try {
+      this.flushing = true;
+      while (index < queue.length) {
+        task = queue[index];
+        if (this.longStacks) {
+          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+        }
+        task.call();
+        index++;
+
+        if (capacity && index > capacity) {
+          for (var scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
+            queue[scan] = queue[scan + index];
+          }
+
+          queue.length -= index;
+          index = 0;
+        }
+      }
+    } catch (error) {
+      onError(error, task, this.longStacks);
+    } finally {
+      this.flushing = false;
+    }
+
+    queue.length = 0;
+  };
+
   TaskQueue.prototype.queueMicroTask = function queueMicroTask(task) {
     if (this.microTaskQueue.length < 1) {
       this.requestFlushMicroTaskQueue();
@@ -109,58 +141,16 @@ var TaskQueue = exports.TaskQueue = function () {
 
   TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
     var queue = this.taskQueue;
-    var index = 0;
-    var task = void 0;
-
     this.taskQueue = [];
 
-    try {
-      this.flushing = true;
-      while (index < queue.length) {
-        task = queue[index];
-        if (this.longStacks) {
-          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
-        }
-        task.call();
-        index++;
-      }
-    } catch (error) {
-      onError(error, task, this.longStacks);
-    } finally {
-      this.flushing = false;
-    }
+    this._flushQueue(queue);
   };
 
   TaskQueue.prototype.flushMicroTaskQueue = function flushMicroTaskQueue() {
     var queue = this.microTaskQueue;
     var capacity = this.microTaskQueueCapacity;
-    var index = 0;
-    var task = void 0;
 
-    try {
-      this.flushing = true;
-      while (index < queue.length) {
-        task = queue[index];
-        if (this.longStacks) {
-          this.stack = typeof task.stack === 'string' ? task.stack : undefined;
-        }
-        task.call();
-        index++;
-
-        if (index > capacity) {
-          for (var scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
-            queue[scan] = queue[scan + index];
-          }
-
-          queue.length -= index;
-          index = 0;
-        }
-      }
-    } catch (error) {
-      onError(error, task, this.longStacks);
-    } finally {
-      this.flushing = false;
-    }
+    this._flushQueue(queue, capacity);
 
     queue.length = 0;
   };
