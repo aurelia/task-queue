@@ -119,7 +119,7 @@ export class TaskQueue {
         // grow, but to avoid an O(n) walk for every MicroTask we execute, we don't
         // shift MicroTasks off the queue after they have been executed.
         // Instead, we periodically shift 1024 MicroTasks off the queue.
-        if (capacity && index > capacity) {
+        if (index > capacity) {
           // Manually shift all values starting at the index back to the
           // beginning of the queue.
           for (let scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
@@ -135,8 +135,6 @@ export class TaskQueue {
     } finally {
       this.flushing = false;
     }
-
-    queue.length = 0;
   }
 
   /**
@@ -151,6 +149,7 @@ export class TaskQueue {
     if (this.longStacks) {
       task.stack = this.prepareQueueStack(microStackSeparator);
     }
+
     this.microTaskQueue.push(task);
   }
 
@@ -166,6 +165,7 @@ export class TaskQueue {
     if (this.longStacks) {
       task.stack = this.prepareQueueStack(stackSeparator);
     }
+
     this.taskQueue.push(task);
   }
 
@@ -175,8 +175,7 @@ export class TaskQueue {
   flushTaskQueue(): void {
     let queue = this.taskQueue;
     this.taskQueue = []; //recursive calls to queueTask should be scheduled after the next cycle
-
-    this._flushQueue(queue);
+    this._flushQueue(queue, Number.MAX_VALUE);
   }
 
   /**
@@ -184,24 +183,24 @@ export class TaskQueue {
   */
   flushMicroTaskQueue(): void {
     let queue = this.microTaskQueue;
-    let capacity = this.microTaskQueueCapacity;
-
-    this._flushQueue(queue, capacity);
-
+    this._flushQueue(queue, this.microTaskQueueCapacity);
     queue.length = 0;
   }
 
   prepareQueueStack(separator) {
     let stack = separator + filterQueueStack(captureStack());
+
     if (typeof this.stack === 'string') {
       stack = filterFlushStack(stack) + this.stack;
     }
+
     return stack;
   }
 }
 
 function captureStack() {
   let error = new Error();
+
   // Firefox, Chrome, Edge all have .stack defined by now, IE has not.
   if (error.stack) {
     return error.stack;
@@ -222,13 +221,16 @@ function filterQueueStack(stack) {
 function filterFlushStack(stack) {
   // Remove bottom frames starting with the last flushTaskQueue or flushMicroTaskQueue
   let index = stack.lastIndexOf('flushMicroTaskQueue');
+
   if (index < 0) {
     index = stack.lastIndexOf('flushTaskQueue');
     if (index < 0) {
       return stack;
     }
   }
+
   index = stack.lastIndexOf('\n', index);
+
   return index < 0 ? stack : stack.substr(0, index);
   // The following would work but without regex support to match from end of string,
   // it's hard to ensure we have the last occurence of "flushTaskQueue".
