@@ -1,3 +1,12 @@
+<a name="1.2.1"></a>
+## [1.2.1](https://github.com/aurelia/task-queue/compare/1.2.0...v1.2.1) (2017-10-01)
+
+
+### Performance Improvements
+
+* **index:** remove capacity defined check ([ef6c4b8](https://github.com/aurelia/task-queue/commit/ef6c4b8))
+* Internal refactoring to reduce code duplication
+
 <a name="1.2.0"></a>
 # [1.2.0](https://github.com/aurelia/task-queue/compare/1.1.0...v1.2.0) (2017-02-21)
 
