@@ -3,7 +3,7 @@
 System.register(['aurelia-pal'], function (_export, _context) {
   "use strict";
 
-  var DOM, FEATURE, _typeof, hasSetImmediate, stackSeparator, microStackSeparator, TaskQueue;
+  var DOM, FEATURE, _typeof, stackSeparator, microStackSeparator, TaskQueue;
 
   
 
@@ -38,10 +38,6 @@ System.register(['aurelia-pal'], function (_export, _context) {
 
     if ('onError' in task) {
       task.onError(error);
-    } else if (hasSetImmediate) {
-      setImmediate(function () {
-        throw error;
-      });
     } else {
       setTimeout(function () {
         throw error;
@@ -90,9 +86,8 @@ System.register(['aurelia-pal'], function (_export, _context) {
       _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
         return typeof obj;
       } : function (obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
       };
-      hasSetImmediate = typeof setImmediate === 'function';
       stackSeparator = '\nEnqueued in TaskQueue by:\n';
       microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
 

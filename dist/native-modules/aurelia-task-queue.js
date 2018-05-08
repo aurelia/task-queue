@@ -1,10 +1,9 @@
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 
 
 import { DOM, FEATURE } from 'aurelia-pal';
 
-var hasSetImmediate = typeof setImmediate === 'function';
 var stackSeparator = '\nEnqueued in TaskQueue by:\n';
 var microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
 
@@ -39,10 +38,6 @@ function onError(error, task, longStacks) {
 
   if ('onError' in task) {
     task.onError(error);
-  } else if (hasSetImmediate) {
-    setImmediate(function () {
-      throw error;
-    });
   } else {
     setTimeout(function () {
       throw error;

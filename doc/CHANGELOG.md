@@ -1,3 +1,10 @@
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/aurelia/task-queue/compare/1.2.1...1.3.0) (2018-05-08)
+
+### Bug Fixes
+
+* Removed setImmediate error handling code which was not compatible with Electron.
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/aurelia/task-queue/compare/1.2.0...v1.2.1) (2017-10-01)
 

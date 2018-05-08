@@ -1,6 +1,5 @@
 import {DOM,FEATURE} from 'aurelia-pal';
 
-let hasSetImmediate = typeof setImmediate === 'function';
 const stackSeparator = '\nEnqueued in TaskQueue by:\n';
 const microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
 
@@ -47,8 +46,6 @@ function onError(error, task, longStacks) {
 
   if ('onError' in task) {
     task.onError(error);
-  } else if (hasSetImmediate) {
-    setImmediate(() => { throw error; });
   } else {
     setTimeout(() => { throw error; }, 0);
   }
