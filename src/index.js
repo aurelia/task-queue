@@ -2,6 +2,7 @@ import {DOM, FEATURE} from 'aurelia-pal';
 
 const stackSeparator = '\nEnqueued in TaskQueue by:\n';
 const microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
+const priorityMicroStackSeparator = '\nEnqueued in PriorityMicroTaskQueue by:\n';
 
 function makeRequestFlushFromMutationObserver(flush) {
   let toggle = 1;
@@ -62,6 +63,17 @@ interface Task {
 }
 
 /**
+* Queue priority, currently only support micro task queue.
+*/
+export const queuePriority = {
+  normal: 0,
+  /**
+  * high priority task will run before normal priority task
+  */
+  high: 1
+};
+
+/**
 * Implements an asynchronous task queue.
 */
 export class TaskQueue {
@@ -80,6 +92,7 @@ export class TaskQueue {
   */
   constructor() {
     this.microTaskQueue = [];
+    this.priorityMicroTaskQueue = [];
     this.microTaskQueueCapacity = 1024;
     this.taskQueue = [];
 
@@ -97,18 +110,51 @@ export class TaskQueue {
   * @param queue The task queue or micro task queue
   * @param capacity For periodically shift 1024 MicroTasks off the queue
   */
-  _flushQueue(queue, capacity): void {
+  _flushQueue(queue, priorityQueue, capacity): void {
     let index = 0;
     let task;
+    let pIndex;
 
     try {
       this.flushing = true;
-      while (index < queue.length) {
+
+      // Check (index < queue.length) after flushing priority queue to ensure to flush priority queue when
+      // (1) queue is empty, and (2) after last task in queue.
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        // flush priority queue
+        if (priorityQueue && priorityQueue.length) {
+          pIndex = 0;
+          while (pIndex < priorityQueue.length) {
+            task = priorityQueue[pIndex];
+            if (this.longStacks) {
+              this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+            }
+            task.call();
+
+            pIndex++;
+
+            // See comments at line:160
+            if (pIndex > capacity) {
+              for (let scan = 0, newLength = priorityQueue.length - pIndex; scan < newLength; scan++) {
+                priorityQueue[scan] = priorityQueue[scan + pIndex];
+              }
+
+              priorityQueue.length -= pIndex;
+              pIndex = 0;
+            }
+          }
+          priorityQueue.length = 0;
+        }
+
+        if (index >= queue.length) break;
+
         task = queue[index];
         if (this.longStacks) {
           this.stack = typeof task.stack === 'string' ? task.stack : undefined;
         }
         task.call();
+
         index++;
 
         // Prevent leaking memory for long chains of recursive calls to `queueMicroTask`.
@@ -137,17 +183,24 @@ export class TaskQueue {
   /**
   * Queues a task on the micro task queue for ASAP execution.
   * @param task The task to queue up for ASAP execution.
+  * @param priority Set true to queue task with high priority, default to false.
   */
-  queueMicroTask(task: Task | Function): void {
-    if (this.microTaskQueue.length < 1) {
+  queueMicroTask(task: Task | Function, priority:number = queuePriority.normal): void {
+    if (this.microTaskQueue.length + this.priorityMicroTaskQueue.length < 1) {
       this.requestFlushMicroTaskQueue();
     }
 
+    let highPriority = priority === queuePriority.high;
+
     if (this.longStacks) {
-      task.stack = this.prepareQueueStack(microStackSeparator);
+      task.stack = this.prepareQueueStack(highPriority ? priorityMicroStackSeparator : microStackSeparator);
     }
 
-    this.microTaskQueue.push(task);
+    if (highPriority) {
+      this.priorityMicroTaskQueue.push(task);
+    } else {
+      this.microTaskQueue.push(task);
+    }
   }
 
   /**
@@ -172,7 +225,7 @@ export class TaskQueue {
   flushTaskQueue(): void {
     let queue = this.taskQueue;
     this.taskQueue = []; //recursive calls to queueTask should be scheduled after the next cycle
-    this._flushQueue(queue, Number.MAX_VALUE);
+    this._flushQueue(queue, null, Number.MAX_VALUE);
   }
 
   /**
@@ -180,7 +233,8 @@ export class TaskQueue {
   */
   flushMicroTaskQueue(): void {
     let queue = this.microTaskQueue;
-    this._flushQueue(queue, this.microTaskQueueCapacity);
+    let priorityQueue = this.priorityMicroTaskQueue;
+    this._flushQueue(queue, priorityQueue, this.microTaskQueueCapacity);
     queue.length = 0;
   }
 
