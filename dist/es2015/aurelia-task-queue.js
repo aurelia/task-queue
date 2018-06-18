@@ -4,13 +4,15 @@ const stackSeparator = '\nEnqueued in TaskQueue by:\n';
 const microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
 
 function makeRequestFlushFromMutationObserver(flush) {
-  let toggle = 1;
   let observer = DOM.createMutationObserver(flush);
-  let node = DOM.createTextNode('');
+  let val = 'a';
+  let node = DOM.createTextNode('a');
+  let values = Object.create(null);
+  values.a = 'b';
+  values.b = 'a';
   observer.observe(node, { characterData: true });
   return function requestFlush() {
-    toggle = -toggle;
-    node.data = toggle;
+    node.data = val = values[val];
   };
 }
 
