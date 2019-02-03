@@ -1,1 +1,0 @@
-export * from 'aurelia-task-queue/aurelia-task-queue';
