@@ -21,6 +21,12 @@
     "type": "git",
     "url": "http://github.com/aurelia/task-queue"
   },
+  "scripts": {
+    "test": "karma start --single-run",
+    "build": "gulp build",
+    "cut-release": "gulp prepare-release",
+    "ci": "gulp ci"
+  },
   "files": [
     "dist",
     "doc",
