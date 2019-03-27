@@ -1,6 +1,6 @@
 {
   "name": "aurelia-task-queue",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "A simple task queue for the browser that enables the queuing of both standard tasks and micro tasks.",
   "keywords": [
     "aurelia",
@@ -37,14 +37,10 @@
   ],
   "jspm": {
     "registry": "npm",
-    "jspmPackage": true,
     "main": "aurelia-task-queue",
     "format": "amd",
     "directories": {
       "dist": "dist/amd"
-    },
-    "peerDependencies": {
-      "aurelia-pal": "^1.0.0"
     },
     "dependencies": {
       "aurelia-pal": "^1.0.0"
