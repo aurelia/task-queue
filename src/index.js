@@ -182,6 +182,9 @@ export class TaskQueue {
   */
   flushMicroTaskQueue(): void {
     let queue = this.microTaskQueue;
+    if (queue.flushing) {
+      return
+    }
     this._flushQueue(queue, this.microTaskQueueCapacity);
     queue.length = 0;
   }
