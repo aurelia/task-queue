@@ -1,4 +1,4 @@
-import {DOM, FEATURE} from 'aurelia-pal';
+import {DOM,FEATURE} from 'aurelia-pal';
 
 const stackSeparator = '\nEnqueued in TaskQueue by:\n';
 const microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
@@ -182,9 +182,6 @@ export class TaskQueue {
   */
   flushMicroTaskQueue(): void {
     let queue = this.microTaskQueue;
-    if (queue.flushing) {
-      return
-    }
     this._flushQueue(queue, this.microTaskQueueCapacity);
     queue.length = 0;
   }
